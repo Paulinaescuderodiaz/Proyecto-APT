@@ -1,0 +1,7 @@
+{
+  "name": "Pethub",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
