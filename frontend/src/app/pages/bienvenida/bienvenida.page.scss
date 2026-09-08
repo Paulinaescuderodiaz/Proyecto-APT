@@ -1,0 +1,142 @@
+ion-content {
+  --background: var(--pethub-background);
+  --color: var(--pethub-text);
+}
+
+.bienvenida {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--pethub-background);
+}
+
+.portada {
+  position: relative;
+  height: clamp(240px, 43dvh, 420px);
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--pethub-teal-light);
+}
+
+.portada img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.degradado {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(27, 78, 78, 0.2),
+    transparent 55%,
+    var(--pethub-background)
+  );
+}
+
+.marca {
+  position: absolute;
+  top: calc(24px + env(safe-area-inset-top, 0px));
+  left: 24px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: var(--pethub-teal);
+  color: #ffffff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.contenido {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 24px calc(28px + env(safe-area-inset-bottom, 0px));
+}
+
+h1 {
+  margin: 0 0 12px;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.5px;
+}
+
+.descripcion {
+  margin: 0 0 24px;
+  color: var(--pethub-text-secondary);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.beneficios {
+  display: grid;
+  gap: 14px;
+  margin: 0 0 28px;
+  padding: 0;
+  list-style: none;
+}
+
+.beneficios li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--pethub-text-secondary);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.beneficios span {
+  width: 24px;
+  flex-shrink: 0;
+  text-align: center;
+  font-size: 19px;
+}
+
+.acciones {
+  display: grid;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.boton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  border: 1px solid var(--pethub-teal);
+  border-radius: 12px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.principal {
+  background: var(--pethub-teal);
+  color: #ffffff;
+}
+
+.principal:hover {
+  background: #246060;
+}
+
+.secundario {
+  background: transparent;
+  color: var(--pethub-teal);
+}
+
+.secundario:hover {
+  background: var(--pethub-teal-light);
+}
+
+.boton:focus-visible {
+  outline: 3px solid var(--pethub-teal);
+  outline-offset: 4px;
+}

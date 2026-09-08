@@ -1,0 +1,90 @@
+﻿<ion-content>
+  <main class="login-layout">
+    <section class="login-card" aria-labelledby="titulo">
+      <header>
+        <div class="marca">Pet<span>hub</span></div>
+        <p class="lema">Su bienestar, siempre contigo.</p>
+      </header>
+
+      <h1 id="titulo">Te damos la bienvenida</h1>
+      <p class="introduccion">
+        Ingresa para cuidar de tus mascotas y conectar con la comunidad.
+      </p>
+
+      <form #formulario="ngForm"
+            (ngSubmit)="ingresar(formulario)"
+            novalidate>
+
+        <label for="correo">Correo electrónico</label>
+        <input
+          id="correo"
+          name="correo"
+          type="email"
+          inputmode="email"
+          autocomplete="username"
+          placeholder="tu correo electrónico"
+          [(ngModel)]="correo"
+          #campoCorreo="ngModel"
+          required
+          email
+          aria-describedby="error-correo"
+          [attr.aria-invalid]="campoCorreo.invalid &&
+            (campoCorreo.touched || formulario.submitted)"
+        />
+
+        <div id="error-correo" class="error" aria-live="polite">
+          @if (campoCorreo.invalid &&
+               (campoCorreo.touched || formulario.submitted)) {
+            Ingresa un correo electrónico válido.
+          }
+        </div>
+
+        <label for="clave">Contraseña</label>
+        <div class="campo-clave">
+          <input
+            id="clave"
+            name="clave"
+            [type]="mostrarClave ? 'text' : 'password'"
+            autocomplete="current-password"
+            placeholder="Ingresa tu contraseña"
+            [(ngModel)]="clave"
+            #campoClave="ngModel"
+            required
+            aria-describedby="error-clave"
+            [attr.aria-invalid]="campoClave.invalid &&
+              (campoClave.touched || formulario.submitted)"
+          />
+          <button
+            type="button"
+            class="mostrar"
+            (click)="mostrarClave = !mostrarClave"
+            [attr.aria-label]="mostrarClave ?
+              'Ocultar contraseña' : 'Mostrar contraseña'"
+            [attr.aria-pressed]="mostrarClave">
+            {{ mostrarClave ? 'Ocultar' : 'Mostrar' }}
+          </button>
+        </div>
+
+        <div id="error-clave" class="error" aria-live="polite">
+          @if (campoClave.invalid &&
+               (campoClave.touched || formulario.submitted)) {
+            Ingresa tu contraseña.
+          }
+        </div>
+
+        <button type="submit" class="ingresar">
+          Iniciar sesión
+        </button>
+
+        <p class="mensaje" role="status">{{ mensaje }}</p>
+      </form>
+
+      <p class="registro">
+        ¿Aún no tienes cuenta?
+        <a routerLink="/registro">Crear cuenta</a>
+      </p>
+
+      <footer>Un espacio para quienes cuidan de sus mascotas.</footer>
+    </section>
+  </main>
+</ion-content>

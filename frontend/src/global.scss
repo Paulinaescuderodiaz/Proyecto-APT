@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@400;500;600;700&display=swap');
+
 /*
  * App Global CSS
  * ----------------------------------------------------------------------------
@@ -35,3 +37,37 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+:root {
+  --ion-font-family: 'Nunito', sans-serif;
+
+  --ion-background-color: #faf8f5;
+  --ion-text-color: #1a2b2b;
+
+  --ion-color-primary: #2d6a6a;
+  --ion-color-primary-rgb: 45, 106, 106;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #285d5d;
+  --ion-color-primary-tint: #427979;
+
+  --pethub-teal: #2d6a6a;
+  --pethub-teal-light: #e8f4f4;
+  --pethub-coral: #e8694a;
+  --pethub-coral-light: #fdf0ec;
+  --pethub-background: #faf8f5;
+  --pethub-surface: #f4f1ed;
+  --pethub-card: #ffffff;
+  --pethub-text: #1a2b2b;
+  --pethub-text-secondary: #4a5f5f;
+  --pethub-border: #e4deda;
+}
+
+h1, h2, h3, h4, h5, h6,
+ion-title {
+  font-family: 'DM Sans', sans-serif;
+}
+
+input, textarea, select, button {
+  font-family: 'Nunito', sans-serif;
+}

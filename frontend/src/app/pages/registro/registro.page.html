@@ -1,0 +1,135 @@
+<ion-content>
+  <main class="login-layout">
+    <section class="login-card" aria-labelledby="titulo">
+      <header>
+        <div class="marca">Pet<span>hub</span></div>
+        <p class="lema">Su bienestar, siempre contigo.</p>
+      </header>
+
+      <h1 id="titulo">Crea tu cuenta</h1>
+      <p class="introduccion">
+        Comienza a cuidar de tus mascotas con Pethub.
+      </p>
+
+      <form
+        #formulario="ngForm"
+        (ngSubmit)="registrar(formulario)"
+        novalidate
+      >
+        <label for="nombre">Nombre completo</label>
+        <input
+          id="nombre"
+          name="nombre"
+          type="text"
+          autocomplete="name"
+          placeholder="Ingresa tu nombre"
+          [(ngModel)]="nombre"
+          #campoNombre="ngModel"
+          required
+          aria-describedby="error-nombre"
+        />
+
+        <div id="error-nombre" class="error" aria-live="polite">
+          @if (!nombre.trim() &&
+               (campoNombre.touched || formulario.submitted)) {
+            Ingresa tu nombre.
+          }
+        </div>
+
+        <label for="correo">Correo electrónico</label>
+        <input
+          id="correo"
+          name="correo"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          placeholder="Ingresa tu correo"
+          [(ngModel)]="correo"
+          #campoCorreo="ngModel"
+          required
+          email
+          aria-describedby="error-correo"
+        />
+
+        <div id="error-correo" class="error" aria-live="polite">
+          @if (campoCorreo.invalid &&
+               (campoCorreo.touched || formulario.submitted)) {
+            Ingresa un correo electrónico válido.
+          }
+        </div>
+
+        <label for="clave">Contraseña</label>
+        <div class="campo-clave">
+          <input
+            id="clave"
+            name="clave"
+            [type]="mostrarClave ? 'text' : 'password'"
+            autocomplete="new-password"
+            placeholder="Mínimo 8 caracteres"
+            [(ngModel)]="clave"
+            #campoClave="ngModel"
+            required
+            minlength="8"
+            aria-describedby="error-clave"
+          />
+
+          <button
+            type="button"
+            class="mostrar"
+            (click)="mostrarClave = !mostrarClave"
+            [attr.aria-label]="mostrarClave ?
+              'Ocultar contraseñas' : 'Mostrar contraseñas'"
+            [attr.aria-pressed]="mostrarClave"
+          >
+            {{ mostrarClave ? 'Ocultar' : 'Mostrar' }}
+          </button>
+        </div>
+
+        <div id="error-clave" class="error" aria-live="polite">
+          @if (campoClave.invalid &&
+               (campoClave.touched || formulario.submitted)) {
+            La contraseña debe tener al menos 8 caracteres.
+          }
+        </div>
+
+        <label for="confirmacion">Confirmar contraseña</label>
+        <input
+          id="confirmacion"
+          name="confirmacion"
+          [type]="mostrarClave ? 'text' : 'password'"
+          autocomplete="new-password"
+          placeholder="Repite tu contraseña"
+          [(ngModel)]="confirmacion"
+          #campoConfirmacion="ngModel"
+          required
+          aria-describedby="error-confirmacion"
+        />
+
+        <div id="error-confirmacion" class="error" aria-live="polite">
+          @if (campoConfirmacion.touched || formulario.submitted) {
+            @if (campoConfirmacion.invalid) {
+              Confirma tu contraseña.
+            } @else if (clave !== confirmacion) {
+              Las contraseñas no coinciden.
+            }
+          }
+        </div>
+
+        <button type="submit" class="ingresar">
+          Crear cuenta
+        </button>
+
+        <p class="mensaje" role="status">{{ mensaje }}</p>
+      </form>
+
+      <p class="registro">
+        ¿Ya tienes cuenta?
+        <a routerLink="/login">Iniciar sesión</a>
+      </p>
+
+      <footer>
+        Un espacio para quienes cuidan de sus mascotas.
+      </footer>
+    </section>
+  </main>
+</ion-content>
