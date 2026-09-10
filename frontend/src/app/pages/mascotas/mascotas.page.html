@@ -40,10 +40,6 @@
           Editar datos
         </button>
       </section>
-
-      <p class="aviso aviso-detalle">
-        Estos datos son temporales y se perderán al recargar.
-      </p>
     </section>
     } @else {
     <header class="encabezado">
@@ -53,16 +49,12 @@
         <p>Su bienestar comienza contigo.</p>
       </div>
 
-      @if (!mostrarFormulario) {
-      <button type="button" class="boton-agregar" aria-label="Agregar mascota" (click)="abrirFormulario()">
-        +
-      </button>
-      }
+        @if (!mostrarFormulario && mascotas.length > 0) {
+  <button type="button" class="boton-agregar" aria-label="Agregar mascota" (click)="abrirFormulario()">
+    +
+  </button>
+  }
     </header>
-
-    <p class="aviso">
-      Vista de prueba: las mascotas agregadas se perderán al recargar.
-    </p>
 
     @if (mostrarFormulario) {
     <section class="formulario" aria-labelledby="titulo-formulario">
@@ -82,7 +74,7 @@
         <input id="foto" type="file" accept="image/jpeg,image/png,image/webp" [disabled]="cargandoFoto"
           (change)="seleccionarFoto($event)" aria-describedby="ayuda-foto" />
 
-        <p id="ayuda-foto">JPG, PNG o WebP. Máximo 5 MB.</p>
+        <p id="ayuda-foto">JPG, PNG o WebP. Máximo 10 MB.</p>
 
         @if (cargandoFoto) {
         <p role="status">Cargando foto…</p>
@@ -163,7 +155,7 @@
           Agrega a tu primera mascota y comienza a organizar su cuidado.
         </p>
         <button type="button" class="primario" (click)="abrirFormulario()">
-          Agregar mi primera mascota
+          Agregar mascota
         </button>
       </div>
       }

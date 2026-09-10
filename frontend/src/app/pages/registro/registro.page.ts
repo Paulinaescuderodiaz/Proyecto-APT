@@ -1,34 +1,37 @@
-import { Component } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { IonContent } from '@ionic/angular';
+import { Component } from "@angular/core";
+import { FormsModule, NgForm } from "@angular/forms";
+import { Router, RouterLink } from "@angular/router";
+import { IonContent } from "@ionic/angular";
+import { AuthService } from "../../services/auth.service";
 
 @Component({
-  selector: 'app-registro',
+  selector: "app-registro",
   standalone: true,
-  templateUrl: './registro.page.html',
-  styleUrls: ['./registro.page.scss'],
+  templateUrl: "./registro.page.html",
+  styleUrls: ["./registro.page.scss"],
   imports: [IonContent, FormsModule, RouterLink]
 })
 export class RegistroPage {
   paso = 1;
-  nombre = '';
-  correo = '';
-  clave = '';
-  confirmacion = '';
-  comuna = '';
+  nombre = "";
+  correo = "";
+  clave = "";
+  confirmacion = "";
+  comuna = "";
   mostrarClave = false;
-  mensaje = '';
+  mensaje = "";
 
   // Comunas incluidas en el prototipo.
   comunas = [
-    'Valparaíso',
-    'Viña del Mar',
-    'Quilpué',
-    'Villa Alemana',
-    'Concón',
-    'Casablanca'
+    "Valparaiso",
+    "Vina del Mar",
+    "Quilpue",
+    "Villa Alemana",
+    "Concon",
+    "Casablanca"
   ];
+
+  constructor(private authService: AuthService, private router: Router) {}
 
   continuar(formulario: NgForm): void {
     if (formulario.invalid || !this.nombre.trim()) {
@@ -36,17 +39,17 @@ export class RegistroPage {
       return;
     }
 
-    this.mensaje = '';
+    this.mensaje = "";
     this.paso = 2;
   }
 
   volver(): void {
     this.paso = 1;
-    this.mensaje = '';
+    this.mensaje = "";
   }
 
   registrar(formulario: NgForm): void {
-    this.mensaje = '';
+    this.mensaje = "";
 
     if (
       formulario.invalid ||
@@ -57,15 +60,32 @@ export class RegistroPage {
       return;
     }
 
-    this.mensaje =
-      'El registro aún no está disponible. No se ha creado una cuenta.';
+    this.authService.registro({
+      nombre: this.nombre,
+      email: this.correo,
+      password: this.clave,
+    }).subscribe({
+      next: () => {
+        this.mensaje = "Cuenta creada con exito. Ya puedes iniciar sesion.";
+        setTimeout(() => {
+          this.router.navigateByUrl("/login");
+        }, 1500);
+      },
+      error: (error) => {
+        if (error.status === 409) {
+          this.mensaje = "Ya existe una cuenta con ese correo.";
+        } else {
+          this.mensaje = "Ocurrio un error al crear la cuenta. Intenta de nuevo.";
+        }
+      },
+    });
   }
 
   ionViewWillLeave(): void {
-    this.clave = '';
-    this.confirmacion = '';
+    this.clave = "";
+    this.confirmacion = "";
     this.mostrarClave = false;
-    this.mensaje = '';
+    this.mensaje = "";
     this.paso = 1;
   }
 }

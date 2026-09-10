@@ -2,7 +2,7 @@ const prisma = require("../lib/prisma");
 
 async function crearMascota(req, res) {
   try {
-    const { nombre, especie, raza, fechaNacimiento, sexo } = req.body;
+    const { nombre, especie, raza, fechaNacimiento, sexo, foto } = req.body;
     const usuarioId = req.usuario.id;
 
     if (!nombre || !especie) {
@@ -16,6 +16,7 @@ async function crearMascota(req, res) {
         raza: raza || null,
         fechaNacimiento: fechaNacimiento ? new Date(fechaNacimiento) : null,
         sexo: sexo || null,
+        foto: foto || null,
         usuarioId,
       },
     });
@@ -33,6 +34,7 @@ async function listarMascotas(req, res) {
 
     const mascotas = await prisma.mascota.findMany({
       where: { usuarioId },
+      orderBy: { createdAt: "asc" },
     });
 
     res.json(mascotas);
@@ -42,4 +44,32 @@ async function listarMascotas(req, res) {
   }
 }
 
-module.exports = { crearMascota, listarMascotas };
+async function actualizarMascota(req, res) {
+  try {
+    const usuarioId = req.usuario.id;
+    const mascotaId = Number(req.params.id);
+    const { nombre, especie, raza, foto } = req.body;
+
+    const existente = await prisma.mascota.findUnique({ where: { id: mascotaId } });
+    if (!existente || existente.usuarioId !== usuarioId) {
+      return res.status(404).json({ error: "Mascota no encontrada" });
+    }
+
+    const mascota = await prisma.mascota.update({
+      where: { id: mascotaId },
+      data: {
+        nombre: nombre ?? existente.nombre,
+        especie: especie ?? existente.especie,
+        raza: raza ?? existente.raza,
+        foto: foto ?? existente.foto,
+      },
+    });
+
+    res.json(mascota);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al actualizar la mascota" });
+  }
+}
+
+module.exports = { crearMascota, listarMascotas, actualizarMascota };

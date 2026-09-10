@@ -25,6 +25,7 @@ model Mascota {
   raza            String?
   fechaNacimiento DateTime?
   sexo            String?
+  foto            String?
   usuarioId       Int
   usuario         Usuario   @relation(fields: [usuarioId], references: [id])
   createdAt       DateTime  @default(now())

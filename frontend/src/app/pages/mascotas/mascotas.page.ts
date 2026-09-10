@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { IonContent } from '@ionic/angular';
+import { MascotaService } from '../../services/mascota.service';
 
 interface Mascota {
   id: number;
@@ -17,7 +18,7 @@ interface Mascota {
   styleUrls: ['./mascotas.page.scss'],
   imports: [IonContent, FormsModule],
 })
-export class MascotasPage {
+export class MascotasPage implements OnInit {
   mascotas: Mascota[] = [];
   mostrarFormulario = false;
 
@@ -30,6 +31,39 @@ export class MascotasPage {
   foto = '';
   errorFoto = '';
   cargandoFoto = false;
+
+  editandoId: number | null = null;
+
+  constructor(
+    private mascotaService: MascotaService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.cargarMascotas();
+  }
+
+  ionViewWillEnter(): void {
+    this.cargarMascotas();
+  }
+
+  cargarMascotas(): void {
+    this.mascotaService.listar().subscribe({
+      next: (mascotasBackend) => {
+        this.mascotas = mascotasBackend.map((m) => ({
+          id: m.id,
+          nombre: m.nombre,
+          especie: m.especie,
+          raza: m.raza ?? '',
+          foto: m.foto ?? '',
+        }));
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error al cargar las mascotas', error);
+      },
+    });
+  }
 
   async seleccionarFoto(evento: Event): Promise<void> {
     const input = evento.target as HTMLInputElement;
@@ -79,8 +113,6 @@ export class MascotasPage {
     this.mascotaSeleccionada = null;
   }
 
-  private siguienteId = 1;
-
   abrirFormulario(): void {
     this.editandoId = null;
     this.nombre = '';
@@ -111,30 +143,50 @@ export class MascotasPage {
     };
 
     if (this.editandoId !== null) {
-      const actualizada: Mascota = {
-        id: this.editandoId,
-        ...datos,
-      };
+      this.mascotaService.actualizar(this.editandoId, datos).subscribe({
+        next: (mascotaActualizada) => {
+          const actualizada: Mascota = {
+            id: mascotaActualizada.id,
+            nombre: mascotaActualizada.nombre,
+            especie: mascotaActualizada.especie,
+            raza: mascotaActualizada.raza ?? '',
+            foto: mascotaActualizada.foto ?? '',
+          };
 
-      this.mascotas = this.mascotas.map(mascota =>
-        mascota.id === this.editandoId ? actualizada : mascota
-      );
+          this.mascotas = this.mascotas.map(mascota =>
+            mascota.id === this.editandoId ? actualizada : mascota
+          );
 
-      this.mascotaSeleccionada = actualizada;
-    } else {
-      this.mascotas = [
-        ...this.mascotas,
-        {
-          id: this.siguienteId++,
-          ...datos,
+          this.editandoId = null;
+          this.mostrarFormulario = false;
+          this.cdr.detectChanges();
         },
-      ];
+        error: (error) => {
+          console.error('Error al actualizar la mascota', error);
+        },
+      });
+    } else {
+      this.mascotaService.crear(datos).subscribe({
+        next: (mascotaCreada) => {
+          this.mascotas = [
+            ...this.mascotas,
+            {
+              id: mascotaCreada.id,
+              nombre: mascotaCreada.nombre,
+              especie: mascotaCreada.especie,
+              raza: mascotaCreada.raza ?? '',
+              foto: mascotaCreada.foto ?? '',
+            },
+          ];
+          this.mostrarFormulario = false;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error al crear la mascota', error);
+        },
+      });
     }
-
-    this.editandoId = null;
-    this.mostrarFormulario = false;
   }
-  editandoId: number | null = null;
 
   editarMascota(mascota: Mascota): void {
     this.editandoId = mascota.id;
