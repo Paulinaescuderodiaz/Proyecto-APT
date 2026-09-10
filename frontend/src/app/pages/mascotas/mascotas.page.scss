@@ -291,3 +291,32 @@ button:focus-visible {
 .editar {
   margin-top: 24px;
 }
+
+.avatar {
+  overflow: hidden;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.foto-preview {
+  display: block;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 12px;
+  border-radius: 20px;
+  object-fit: cover;
+}
+
+#ayuda-foto {
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
