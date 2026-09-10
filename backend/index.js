@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const authRoutes = require("./src/routes/auth.routes");
+const mascotaRoutes = require("./src/routes/mascota.routes");
 
 const app = express();
 const PORT = 3000;
@@ -12,6 +13,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/mascotas", mascotaRoutes);
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
