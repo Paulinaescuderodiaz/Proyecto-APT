@@ -11,20 +11,47 @@ import { IonContent } from '@ionic/angular';
   imports: [IonContent, FormsModule, RouterLink]
 })
 export class RegistroPage {
+  paso = 1;
   nombre = '';
   correo = '';
   clave = '';
   confirmacion = '';
+  comuna = '';
   mostrarClave = false;
   mensaje = '';
+
+  // Comunas incluidas en el prototipo.
+  comunas = [
+    'Valparaíso',
+    'Viña del Mar',
+    'Quilpué',
+    'Villa Alemana',
+    'Concón',
+    'Casablanca'
+  ];
+
+  continuar(formulario: NgForm): void {
+    if (formulario.invalid || !this.nombre.trim()) {
+      formulario.control.markAllAsTouched();
+      return;
+    }
+
+    this.mensaje = '';
+    this.paso = 2;
+  }
+
+  volver(): void {
+    this.paso = 1;
+    this.mensaje = '';
+  }
 
   registrar(formulario: NgForm): void {
     this.mensaje = '';
 
     if (
       formulario.invalid ||
-      !this.nombre.trim() ||
-      this.clave !== this.confirmacion
+      this.clave !== this.confirmacion ||
+      !this.comunas.includes(this.comuna)
     ) {
       formulario.control.markAllAsTouched();
       return;
@@ -39,5 +66,6 @@ export class RegistroPage {
     this.confirmacion = '';
     this.mostrarClave = false;
     this.mensaje = '';
+    this.paso = 1;
   }
 }

@@ -1,135 +1,225 @@
 <ion-content>
-  <main class="login-layout">
-    <section class="login-card" aria-labelledby="titulo">
-      <header>
-        <div class="marca">Pet<span>hub</span></div>
-        <p class="lema">Su bienestar, siempre contigo.</p>
-      </header>
+  <main class="registro-layout">
+    <header class="encabezado">
+      @if (paso === 1) {
+        <a
+          routerLink="/bienvenida"
+          class="volver"
+          aria-label="Volver a la bienvenida"
+        >
+          <span aria-hidden="true">←</span>
+        </a>
+      } @else {
+        <button
+          type="button"
+          class="volver"
+          (click)="volver()"
+          aria-label="Volver al paso anterior"
+        >
+          <span aria-hidden="true">←</span>
+        </button>
+      }
 
-      <h1 id="titulo">Crea tu cuenta</h1>
-      <p class="introduccion">
-        Comienza a cuidar de tus mascotas con Pethub.
-      </p>
+      <div class="titulo-progreso">
+        <h1>Crear cuenta</h1>
 
+        <div
+          class="progreso"
+          role="progressbar"
+          aria-label="Progreso del registro"
+          aria-valuemin="1"
+          aria-valuemax="2"
+          [attr.aria-valuenow]="paso"
+          [attr.aria-valuetext]="'Paso ' + paso + ' de 2'"
+        >
+          <span class="activo"></span>
+          <span [class.activo]="paso === 2"></span>
+        </div>
+      </div>
+    </header>
+
+    @if (paso === 1) {
       <form
-        #formulario="ngForm"
-        (ngSubmit)="registrar(formulario)"
+        #datosForm="ngForm"
+        (ngSubmit)="continuar(datosForm)"
         novalidate
       >
-        <label for="nombre">Nombre completo</label>
-        <input
-          id="nombre"
-          name="nombre"
-          type="text"
-          autocomplete="name"
-          placeholder="Ingresa tu nombre"
-          [(ngModel)]="nombre"
-          #campoNombre="ngModel"
-          required
-          aria-describedby="error-nombre"
-        />
+        <h2>Paso 1 de 2 — Datos básicos</h2>
 
-        <div id="error-nombre" class="error" aria-live="polite">
-          @if (!nombre.trim() &&
-               (campoNombre.touched || formulario.submitted)) {
-            Ingresa tu nombre.
-          }
-        </div>
-
-        <label for="correo">Correo electrónico</label>
-        <input
-          id="correo"
-          name="correo"
-          type="email"
-          inputmode="email"
-          autocomplete="email"
-          placeholder="Ingresa tu correo"
-          [(ngModel)]="correo"
-          #campoCorreo="ngModel"
-          required
-          email
-          aria-describedby="error-correo"
-        />
-
-        <div id="error-correo" class="error" aria-live="polite">
-          @if (campoCorreo.invalid &&
-               (campoCorreo.touched || formulario.submitted)) {
-            Ingresa un correo electrónico válido.
-          }
-        </div>
-
-        <label for="clave">Contraseña</label>
-        <div class="campo-clave">
+        <div class="campo">
+          <label for="nombre">Nombre completo</label>
           <input
-            id="clave"
-            name="clave"
-            [type]="mostrarClave ? 'text' : 'password'"
-            autocomplete="new-password"
-            placeholder="Mínimo 8 caracteres"
-            [(ngModel)]="clave"
-            #campoClave="ngModel"
+            id="nombre"
+            name="nombre"
+            type="text"
+            autocomplete="name"
+            placeholder="Ingresa tu nombre"
+            [(ngModel)]="nombre"
+            #campoNombre="ngModel"
             required
-            minlength="8"
-            aria-describedby="error-clave"
+            aria-describedby="error-nombre"
+            [attr.aria-invalid]="!nombre.trim() &&
+              (campoNombre.touched || datosForm.submitted)"
           />
 
-          <button
-            type="button"
-            class="mostrar"
-            (click)="mostrarClave = !mostrarClave"
-            [attr.aria-label]="mostrarClave ?
-              'Ocultar contraseñas' : 'Mostrar contraseñas'"
-            [attr.aria-pressed]="mostrarClave"
-          >
-            {{ mostrarClave ? 'Ocultar' : 'Mostrar' }}
-          </button>
-        </div>
-
-        <div id="error-clave" class="error" aria-live="polite">
-          @if (campoClave.invalid &&
-               (campoClave.touched || formulario.submitted)) {
-            La contraseña debe tener al menos 8 caracteres.
-          }
-        </div>
-
-        <label for="confirmacion">Confirmar contraseña</label>
-        <input
-          id="confirmacion"
-          name="confirmacion"
-          [type]="mostrarClave ? 'text' : 'password'"
-          autocomplete="new-password"
-          placeholder="Repite tu contraseña"
-          [(ngModel)]="confirmacion"
-          #campoConfirmacion="ngModel"
-          required
-          aria-describedby="error-confirmacion"
-        />
-
-        <div id="error-confirmacion" class="error" aria-live="polite">
-          @if (campoConfirmacion.touched || formulario.submitted) {
-            @if (campoConfirmacion.invalid) {
-              Confirma tu contraseña.
-            } @else if (clave !== confirmacion) {
-              Las contraseñas no coinciden.
+          <div id="error-nombre" class="error" aria-live="polite">
+            @if (!nombre.trim() &&
+                 (campoNombre.touched || datosForm.submitted)) {
+              Ingresa tu nombre.
             }
-          }
+          </div>
         </div>
 
-        <button type="submit" class="ingresar">
-          Crear cuenta
-        </button>
+        <div class="campo">
+          <label for="correo">Correo electrónico</label>
+          <input
+            id="correo"
+            name="correo"
+            type="email"
+            inputmode="email"
+            autocomplete="email"
+            placeholder="correo@ejemplo.cl"
+            [(ngModel)]="correo"
+            #campoCorreo="ngModel"
+            required
+            email
+            aria-describedby="error-correo"
+            [attr.aria-invalid]="campoCorreo.invalid &&
+              (campoCorreo.touched || datosForm.submitted)"
+          />
 
-        <p class="mensaje" role="status">{{ mensaje }}</p>
+          <div id="error-correo" class="error" aria-live="polite">
+            @if (campoCorreo.invalid &&
+                 (campoCorreo.touched || datosForm.submitted)) {
+              Ingresa un correo electrónico válido.
+            }
+          </div>
+        </div>
+
+        <div class="acciones">
+          <button type="submit" class="principal">
+            Continuar
+          </button>
+
+          <p class="acceso">
+            ¿Ya tienes cuenta?
+            <a routerLink="/login">Ingresar</a>
+          </p>
+        </div>
       </form>
+    } @else {
+      <form
+        #seguridadForm="ngForm"
+        (ngSubmit)="registrar(seguridadForm)"
+        novalidate
+      >
+        <h2>Paso 2 de 2 — Contraseña y ubicación</h2>
 
-      <p class="registro">
-        ¿Ya tienes cuenta?
-        <a routerLink="/login">Iniciar sesión</a>
-      </p>
+        <div class="campo">
+          <label for="clave">Contraseña</label>
+          <div class="campo-clave">
+            <input
+              id="clave"
+              name="clave"
+              [type]="mostrarClave ? 'text' : 'password'"
+              autocomplete="new-password"
+              placeholder="Mínimo 8 caracteres"
+              [(ngModel)]="clave"
+              #campoClave="ngModel"
+              required
+              minlength="8"
+              aria-describedby="error-clave"
+              [attr.aria-invalid]="campoClave.invalid &&
+                (campoClave.touched || seguridadForm.submitted)"
+            />
 
-      <footer>
-        Un espacio para quienes cuidan de sus mascotas.
-      </footer>
-    </section>
+            <button
+              type="button"
+              class="mostrar"
+              (click)="mostrarClave = !mostrarClave"
+              [attr.aria-pressed]="mostrarClave"
+              [attr.aria-label]="mostrarClave ?
+                'Ocultar contraseñas' : 'Mostrar contraseñas'"
+            >
+              {{ mostrarClave ? 'Ocultar' : 'Mostrar' }}
+            </button>
+          </div>
+
+          <div id="error-clave" class="error" aria-live="polite">
+            @if (campoClave.invalid &&
+                 (campoClave.touched || seguridadForm.submitted)) {
+              La contraseña debe tener al menos 8 caracteres.
+            }
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="confirmacion">Confirmar contraseña</label>
+          <input
+            id="confirmacion"
+            name="confirmacion"
+            [type]="mostrarClave ? 'text' : 'password'"
+            autocomplete="new-password"
+            placeholder="Repite tu contraseña"
+            [(ngModel)]="confirmacion"
+            #campoConfirmacion="ngModel"
+            required
+            aria-describedby="error-confirmacion"
+            [attr.aria-invalid]="
+              (campoConfirmacion.invalid || clave !== confirmacion) &&
+              (campoConfirmacion.touched || seguridadForm.submitted)"
+          />
+
+          <div id="error-confirmacion" class="error" aria-live="polite">
+            @if (campoConfirmacion.touched || seguridadForm.submitted) {
+              @if (campoConfirmacion.invalid) {
+                Confirma tu contraseña.
+              } @else if (clave !== confirmacion) {
+                Las contraseñas no coinciden.
+              }
+            }
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="comuna">Tu comuna</label>
+          <select
+            id="comuna"
+            name="comuna"
+            [(ngModel)]="comuna"
+            #campoComuna="ngModel"
+            required
+            aria-describedby="error-comuna"
+            [attr.aria-invalid]="campoComuna.invalid &&
+              (campoComuna.touched || seguridadForm.submitted)"
+          >
+            <option value="" disabled>Selecciona tu comuna</option>
+            @for (opcion of comunas; track opcion) {
+              <option [value]="opcion">{{ opcion }}</option>
+            }
+          </select>
+
+          <div id="error-comuna" class="error" aria-live="polite">
+            @if (campoComuna.invalid &&
+                 (campoComuna.touched || seguridadForm.submitted)) {
+              Selecciona tu comuna.
+            }
+          </div>
+        </div>
+
+        <div class="acciones">
+          <p class="mensaje" role="status">{{ mensaje }}</p>
+
+          <button type="submit" class="principal">
+            Crear cuenta
+          </button>
+
+          <p class="acceso">
+            ¿Ya tienes cuenta?
+            <a routerLink="/login">Ingresar</a>
+          </p>
+        </div>
+      </form>
+    }
   </main>
 </ion-content>
