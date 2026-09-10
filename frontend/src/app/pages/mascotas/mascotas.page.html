@@ -1,13 +1,133 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>mascotas</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content>
+  <main class="pagina">
+    <header class="encabezado">
+      <div>
+        <p class="marca">Pethub</p>
+        <h1>Mis mascotas</h1>
+        <p>Su bienestar comienza contigo.</p>
+      </div>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">mascotas</ion-title>
-    </ion-toolbar>
-  </ion-header>
+      @if (!mostrarFormulario) {
+        <button
+          type="button"
+          class="boton-agregar"
+          aria-label="Agregar mascota"
+          (click)="abrirFormulario()"
+        >
+          +
+        </button>
+      }
+    </header>
+
+    <p class="aviso">
+      Vista de prueba: las mascotas agregadas se perderán al recargar.
+    </p>
+
+    @if (mostrarFormulario) {
+      <section class="formulario" aria-labelledby="titulo-formulario">
+        <h2 id="titulo-formulario">Agregar mascota</h2>
+        <p>Cuéntanos un poco sobre tu compañero.</p>
+
+        <form #formulario="ngForm" (ngSubmit)="agregar(formulario)" novalidate>
+          <label for="nombre">Nombre</label>
+          <input
+            id="nombre"
+            name="nombre"
+            [(ngModel)]="nombre"
+            #campoNombre="ngModel"
+            required
+            maxlength="60"
+            placeholder="¿Cómo se llama?"
+            aria-describedby="error-nombre"
+          />
+
+          @if (!nombre.trim() &&
+               (campoNombre.touched || formulario.submitted)) {
+            <p id="error-nombre" class="error" role="alert">
+              Ingresa el nombre de tu mascota.
+            </p>
+          }
+
+          <label for="especie">Especie</label>
+          <select
+            id="especie"
+            name="especie"
+            [(ngModel)]="especie"
+            #campoEspecie="ngModel"
+            required
+            aria-describedby="error-especie"
+          >
+            <option value="" disabled>Selecciona una opción</option>
+            <option value="Perro">Perro</option>
+            <option value="Gato">Gato</option>
+          </select>
+
+          @if (campoEspecie.invalid &&
+               (campoEspecie.touched || formulario.submitted)) {
+            <p id="error-especie" class="error" role="alert">
+              Selecciona la especie.
+            </p>
+          }
+
+          <label for="raza">Raza (opcional)</label>
+          <input
+            id="raza"
+            name="raza"
+            [(ngModel)]="raza"
+            maxlength="80"
+            placeholder="Por ejemplo: mestizo"
+          />
+
+          <div class="acciones">
+            <button type="submit" class="primario">
+              Agregar a la lista
+            </button>
+            <button
+              type="button"
+              class="secundario"
+              (click)="mostrarFormulario = false"
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </section>
+    } @else {
+      <section aria-label="Lista de mascotas">
+        @for (mascota of mascotas; track mascota.id) {
+          <article class="tarjeta">
+            <div class="avatar" aria-hidden="true">
+              {{ mascota.especie === 'Perro' ? '🐶' : '🐱' }}
+            </div>
+
+            <div class="datos">
+              <h2>{{ mascota.nombre }}</h2>
+              <p>
+                {{ mascota.especie }}
+                @if (mascota.raza) {
+                  · {{ mascota.raza }}
+                }
+              </p>
+              <span class="etiqueta">Mi compañero</span>
+            </div>
+          </article>
+        } @empty {
+          <div class="vacio">
+            <div class="huella" aria-hidden="true">🐾</div>
+            <h2>Tu familia peluda va aquí</h2>
+            <p>
+              Agrega a tu primera mascota y comienza a organizar su cuidado.
+            </p>
+            <button
+              type="button"
+              class="primario"
+              (click)="abrirFormulario()"
+            >
+              Agregar mi primera mascota
+            </button>
+          </div>
+        }
+      </section>
+    }
+  </main>
 </ion-content>

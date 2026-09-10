@@ -1,19 +1,58 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular';
+import { Component } from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms';
+import { IonContent } from '@ionic/angular';
+
+interface Mascota {
+  id: number;
+  nombre: string;
+  especie: string;
+  raza: string;
+}
 
 @Component({
   selector: 'app-mascotas',
+  standalone: true,
   templateUrl: './mascotas.page.html',
   styleUrls: ['./mascotas.page.scss'],
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [IonContent, FormsModule],
 })
-export class MascotasPage implements OnInit {
+export class MascotasPage {
+  mascotas: Mascota[] = [];
+  mostrarFormulario = false;
 
-  constructor() { }
+  nombre = '';
+  especie = '';
+  raza = '';
 
-  ngOnInit() {
+  private siguienteId = 1;
+
+  abrirFormulario(): void {
+    this.nombre = '';
+    this.especie = '';
+    this.raza = '';
+    this.mostrarFormulario = true;
   }
 
+  agregar(formulario: NgForm): void {
+    if (
+      formulario.invalid ||
+      !this.nombre.trim() ||
+      !['Perro', 'Gato'].includes(this.especie)
+    ) {
+      formulario.control.markAllAsTouched();
+      return;
+    }
+
+    this.mascotas = [
+      ...this.mascotas,
+      {
+        id: this.siguienteId++,
+        nombre: this.nombre.trim(),
+        especie: this.especie,
+        raza: this.raza.trim(),
+      },
+    ];
+
+    this.mostrarFormulario = false;
+  }
 }
