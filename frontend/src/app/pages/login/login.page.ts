@@ -32,7 +32,7 @@ export class LoginPage {
       password: this.clave,
     }).subscribe({
       next: () => {
-        this.router.navigateByUrl("/home");
+        this.router.navigateByUrl("/mascotas");
       },
       error: (error) => {
         if (error.status === 401) {
