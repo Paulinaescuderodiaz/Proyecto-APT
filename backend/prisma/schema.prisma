@@ -1,23 +1,31 @@
+// --- Configuración del generador ---
+// Le dice a Prisma que genere el "cliente" (el código JS que usamos como
+// prisma.usuario.create(), prisma.vacuna.findMany(), etc.) en node_modules
 generator client {
   provider = "prisma-client-js"
 }
 
+// --- Configuración de la conexión a la base de datos ---
+// provider indica qué motor de base de datos usamos (PostgreSQL)
+// url la toma de la variable DATABASE_URL definida en el archivo .env
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+// Representa a cada persona que se registra en la app (dueño de mascota)
 model Usuario {
-  id        Int       @id @default(autoincrement())
+  id        Int       @id @default(autoincrement()) // identificador único, autogenerado
   nombre    String
-  email     String    @unique
-  password  String
-  telefono  String?
+  email     String    @unique // @unique impide que dos usuarios tengan el mismo correo
+  password  String    // guarda el HASH de la contraseña, nunca el texto original
+  telefono  String?   // el "?" significa opcional
   comuna    String?
-  createdAt DateTime  @default(now())
-  mascotas  Mascota[]
+  createdAt DateTime  @default(now()) // fecha en que se creó la cuenta, se llena sola
+  mascotas  Mascota[] // lado inverso: un usuario puede tener muchas mascotas
 }
 
+// Representa a cada mascota registrada por un usuario
 model Mascota {
   id              Int       @id @default(autoincrement())
   nombre          String
@@ -26,7 +34,45 @@ model Mascota {
   fechaNacimiento DateTime?
   sexo            String?
   foto            String?
-  usuarioId       Int
-  usuario         Usuario   @relation(fields: [usuarioId], references: [id])
+  usuarioId       Int       // guarda el id del usuario dueño de esta mascota
+  usuario         Usuario   @relation(fields: [usuarioId], references: [id]) // conecta con Usuario
   createdAt       DateTime  @default(now())
+  vacunas         Vacuna[]          // lado inverso: una mascota puede tener muchas vacunas
+  registrosMedicos RegistroMedico[] // lado inverso: una mascota puede tener muchos registros médicos
+}
+
+// Representa cada vacuna aplicada (o por aplicar) a una mascota — S2-HU04
+model Vacuna {
+  id                    Int       @id @default(autoincrement())
+  nombre                String
+  fechaAplicacion       DateTime
+  fechaProximoRefuerzo  DateTime? // opcional: no todas las vacunas requieren refuerzo
+  aplicada              Boolean   @default(false) // empieza en falso; se usará en HU07 (recordatorios)
+  mascotaId             Int
+  mascota               Mascota   @relation(fields: [mascotaId], references: [id])
+  createdAt             DateTime  @default(now())
+}
+
+// Representa cada enfermedad/diagnóstico y su tratamiento — S2-HU05
+model RegistroMedico {
+  id           Int       @id @default(autoincrement())
+  diagnostico  String    // obligatorio: sin esto no se puede guardar (escenario 2 de HU05)
+  fecha        DateTime  // necesaria para poder ordenar el historial (escenario 3 de HU05)
+  tratamiento  String?   // opcional: la historia no exige que sea obligatorio
+  mascotaId    Int
+  mascota      Mascota   @relation(fields: [mascotaId], references: [id])
+  createdAt    DateTime  @default(now())
+  documentos Documento[]
+}
+
+// Representa cada archivo (foto o PDF) adjuntado a un registro médico — S2-HU06
+model Documento {
+  id               Int             @id @default(autoincrement())
+  nombreArchivo    String          // nombre original del archivo (ej: "radiografia.pdf")
+  rutaArchivo      String          // dónde quedó guardado el archivo en el servidor
+  tipoArchivo      String          // extensión o tipo (ej: "application/pdf", "image/png")
+  tamano           Int             // tamaño del archivo en bytes
+  registroMedicoId Int
+  registroMedico   RegistroMedico  @relation(fields: [registroMedicoId], references: [id])
+  createdAt        DateTime        @default(now())
 }
