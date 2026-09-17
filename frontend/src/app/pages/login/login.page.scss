@@ -223,3 +223,14 @@ input[aria-invalid='true'] {
 .ingresar:hover {
   background: #246060;
 }
+
+.mensaje {
+  color: #b42318;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-top: 12px;
+}
+
+.mensaje:empty {
+  display: none;
+}
