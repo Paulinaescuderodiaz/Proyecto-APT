@@ -31,30 +31,21 @@ export class LoginPage {
       return;
     }
 
-    this.authService
-      .login({
-        email: this.correo.trim(),
-        password: this.clave,
-      })
-      .subscribe({
-        next: () => {
-          this.router.navigateByUrl("/mascotas");
-        },
-        error: (error) => {
-          if (error.status === 401) {
-            this.mensaje =
-              "Correo o contraseña incorrectos. Revisa tus datos e intenta nuevamente.";
-          } else if (error.status === 0) {
-            this.mensaje =
-              "No pudimos conectar con el servidor. Intenta nuevamente.";
-          } else {
-            this.mensaje =
-              "No pudimos iniciar sesión. Intenta nuevamente más tarde.";
-          }
-
-          this.cdr.detectChanges();
-        },
-      });
+    this.authService.login({
+      email: this.correo,
+      password: this.clave,
+    }).subscribe({
+      next: () => {
+        this.router.navigateByUrl("/mascotas");
+      },
+      error: (error) => {
+        if (error.status === 401) {
+          this.mensaje = "Correo o contrasena incorrectos.";
+        } else {
+          this.mensaje = "Ocurrio un error al iniciar sesion. Intenta de nuevo.";
+        }
+      },
+    });
   }
 
   ionViewWillLeave(): void {
