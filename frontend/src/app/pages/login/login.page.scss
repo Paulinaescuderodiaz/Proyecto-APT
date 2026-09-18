@@ -7,6 +7,7 @@ ion-content {
   --color: #193b36;
 }
 
+// Centra la tarjeta de ingreso y mantiene espacio alrededor en pantallas pequeñas.
 .login-layout {
   min-height: 100%;
   display: grid;
@@ -100,6 +101,7 @@ input[aria-invalid='true'] {
   border-color: #b42318;
 }
 
+// Alinea el campo de contraseña con su control de visibilidad.
 .campo-clave {
   display: flex;
   align-items: center;
@@ -126,6 +128,7 @@ button {
   font-weight: 600;
 }
 
+// Reserva espacio para validaciones de campos y usa rojo para señalar errores.
 .error {
   min-height: 28px;
   padding-top: 5px;
@@ -180,11 +183,13 @@ footer {
   font-size: 12px;
 }
 
+// Reduce el espacio interior en dispositivos estrechos.
 @media (max-width: 380px) {
   .login-layout { padding: 20px 12px; }
   .login-card { padding: 28px 20px; }
 }
 
+// Las reglas finales aplican la paleta compartida sobre los colores definidos anteriormente.
 ion-content {
   --background: var(--pethub-background);
   --color: var(--pethub-text);
@@ -224,6 +229,7 @@ input[aria-invalid='true'] {
   background: #246060;
 }
 
+// Aviso del servidor; la regla :empty lo oculta cuando no hay mensaje.
 .mensaje {
   color: #b42318;
   font-size: 14px;

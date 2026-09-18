@@ -1,5 +1,6 @@
 <ion-content>
   <main class="registro-layout">
+    <!-- La flecha vuelve a bienvenida desde el paso 1 y a los datos básicos desde el paso 2. -->
     <header class="encabezado">
       @if (paso === 1) {
         <a
@@ -38,6 +39,7 @@
       </div>
     </header>
 
+    <!-- Cada paso tiene su propio NgForm; los valores se conservan en el componente al cambiar de paso. -->
     @if (paso === 1) {
       <form
         #datosForm="ngForm"
@@ -170,6 +172,7 @@
               (campoConfirmacion.touched || seguridadForm.submitted)"
           />
 
+          <!-- La confirmación debe coincidir con la clave; este campo no se envía a la API. -->
           <div id="error-confirmacion" class="error" aria-live="polite">
             @if (campoConfirmacion.touched || seguridadForm.submitted) {
               @if (campoConfirmacion.invalid) {
@@ -183,6 +186,7 @@
 
         <div class="campo">
           <label for="comuna">Tu comuna</label>
+          <!-- Las opciones provienen del catálogo comunas definido en RegistroPage. -->
           <select
             id="comuna"
             name="comuna"
@@ -208,6 +212,7 @@
         </div>
 
         <div class="acciones">
+          <!-- Muestra el resultado del registro, incluido el correo duplicado (409). -->
           <p class="mensaje" role="status">{{ mensaje }}</p>
 
           <button type="submit" class="principal">

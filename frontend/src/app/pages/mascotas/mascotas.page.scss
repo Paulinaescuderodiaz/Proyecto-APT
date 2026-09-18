@@ -8,6 +8,7 @@ ion-content {
   --background: #faf8f5;
 }
 
+// Limita el ancho y respeta las áreas seguras superior e inferior del dispositivo.
 .pagina {
   max-width: 480px;
   margin: 0 auto;
@@ -80,6 +81,7 @@ button {
   font-size: 12px;
 }
 
+// Presentación de cada mascota; el HTML usa un botón para permitir acceso con teclado.
 .tarjeta {
   display: flex;
   align-items: center;
@@ -138,6 +140,7 @@ button {
   margin-top: 28px;
 }
 
+// Contenedor común del formulario de alta/edición y de los datos de la ficha.
 .formulario {
   padding: 22px;
   border: 1px solid var(--borde);
@@ -230,6 +233,7 @@ button:focus-visible {
   font-weight: 700;
 }
 
+// Cabecera centrada de la ficha con avatar ampliado.
 .detalle-cabecera {
   padding: 24px 0 32px;
   text-align: center;
@@ -296,6 +300,7 @@ button:focus-visible {
   overflow: hidden;
 }
 
+// Recorta la imagen para llenar el avatar sin deformarla.
 .avatar img {
   width: 100%;
   height: 100%;
@@ -316,6 +321,7 @@ button:focus-visible {
   font-size: 12px;
 }
 
+// Señal visual de controles bloqueados mientras se lee la foto.
 button:disabled {
   opacity: 0.6;
   cursor: wait;
