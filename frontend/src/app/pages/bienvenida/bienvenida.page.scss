@@ -13,6 +13,7 @@ ion-content {
   background: var(--pethub-background);
 }
 
+// Altura adaptable al viewport; el recorte mantiene la imagen dentro de la portada.
 .portada {
   position: relative;
   height: clamp(240px, 43dvh, 420px);
@@ -51,6 +52,7 @@ ion-content {
   font-weight: 700;
 }
 
+// El espacio inferior respeta el área segura del dispositivo.
 .contenido {
   flex: 1;
   display: flex;
@@ -136,6 +138,7 @@ h1 {
   background: var(--pethub-teal-light);
 }
 
+// Resalta el foco al navegar con teclado.
 .boton:focus-visible {
   outline: 3px solid var(--pethub-teal);
   outline-offset: 4px;

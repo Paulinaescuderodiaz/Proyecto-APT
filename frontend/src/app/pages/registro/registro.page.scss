@@ -57,6 +57,7 @@ h1 {
   font-weight: 700;
 }
 
+// Indicador visual de dos pasos; el HTML asigna la clase activo según el paso actual.
 .progreso {
   display: flex;
   gap: 6px;
@@ -153,6 +154,7 @@ button {
   line-height: 1.4;
 }
 
+// Empuja los botones hacia el final del formulario cuando hay espacio disponible.
 .acciones {
   margin-top: auto;
   padding-top: 28px;

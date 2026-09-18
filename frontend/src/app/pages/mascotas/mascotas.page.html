@@ -1,5 +1,6 @@
 <ion-content>
   <main class="pagina">
+    <!-- La selección tiene prioridad: muestra detalle; sin selección, alterna formulario y listado. -->
     @if (mascotaSeleccionada; as mascota) {
     <section aria-labelledby="titulo-detalle">
       <button type="button" class="volver" (click)="volverAlListado()">
@@ -8,6 +9,7 @@
 
       <div class="detalle-cabecera">
         <div class="avatar avatar-grande" aria-hidden="true">
+          <!-- Usa la foto guardada o un emoji según la especie cuando no hay imagen. -->
           @if (mascota.foto) {
           <img [src]="mascota.foto" alt="" />
           } @else {
@@ -63,6 +65,7 @@
       </h2>
       <p>Cuéntanos un poco sobre tu compañero.</p>
 
+      <!-- Formulario compartido para alta y edición; editandoId determina la operación al guardar. -->
       <form #formulario="ngForm" (ngSubmit)="agregar(formulario)" novalidate>
 
         <label for="foto">Foto de tu mascota (opcional)</label>
@@ -71,9 +74,11 @@
         <img class="foto-preview" [src]="foto" alt="Vista previa de la foto seleccionada" />
         }
 
+        <!-- El archivo se valida y convierte en Data URL en seleccionarFoto; accept orienta el selector. -->
         <input id="foto" type="file" accept="image/jpeg,image/png,image/webp" [disabled]="cargandoFoto"
           (change)="seleccionarFoto($event)" aria-describedby="ayuda-foto" />
 
+        <!-- Pendiente: el texto indica 10 MB, pero seleccionarFoto valida un máximo de 5 MB. -->
         <p id="ayuda-foto">JPG, PNG o WebP. Máximo 10 MB.</p>
 
         @if (cargandoFoto) {
@@ -112,6 +117,7 @@
         <label for="raza">Raza (opcional)</label>
         <input id="raza" name="raza" [(ngModel)]="raza" maxlength="80" placeholder="Por ejemplo: mestizo" />
 
+        <!-- Mientras se lee la foto se deshabilitan guardar y cancelar. -->
         <div class="acciones">
           <button type="submit" class="primario" [disabled]="cargandoFoto">
             {{ editandoId !== null ? 'Guardar cambios' : 'Agregar a la lista' }}
@@ -125,6 +131,7 @@
     </section>
     } @else {
     <section aria-label="Lista de mascotas">
+      <!-- El id estable identifica cada tarjeta; pulsarla abre el detalle. -->
       @for (mascota of mascotas; track mascota.id) {
       <button type="button" class="tarjeta" [attr.aria-label]="'Ver ficha de ' + mascota.nombre"
         (click)="verDetalle(mascota)">
@@ -148,6 +155,7 @@
         </div>
       </button>
       } @empty {
+      <!-- Estado vacío cuando la colección no contiene mascotas. -->
       <div class="vacio">
         <div class="huella" aria-hidden="true">🐾</div>
         <h2>Tu familia peluda va aquí</h2>

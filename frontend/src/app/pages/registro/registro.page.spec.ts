@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RegistroPage } from './registro.page';
 
+// Prueba básica de creación del componente; no comprueba el flujo completo de la pantalla.
 describe('RegistroPage', () => {
   let component: RegistroPage;
   let fixture: ComponentFixture<RegistroPage>;
