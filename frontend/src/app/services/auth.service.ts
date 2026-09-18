@@ -6,6 +6,7 @@ interface RegistroData {
   nombre: string;
   email: string;
   password: string;
+  comuna: string;
 }
 
 interface LoginData {
@@ -55,3 +56,5 @@ export class AuthService {
     return usuario ? JSON.parse(usuario) : null;
   }
 }
+
+

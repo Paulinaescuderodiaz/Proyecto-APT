@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, ChangeDetectorRef } from "@angular/core";
 import { FormsModule, NgForm } from "@angular/forms";
 import { Router, RouterLink } from "@angular/router";
 import { IonContent } from "@ionic/angular";
@@ -9,7 +9,7 @@ import { AuthService } from "../../services/auth.service";
   standalone: true,
   templateUrl: "./login.page.html",
   styleUrls: ["./login.page.scss"],
-  imports: [IonContent, FormsModule, RouterLink]
+  imports: [IonContent, FormsModule, RouterLink],
 })
 export class LoginPage {
   correo = "";
@@ -17,7 +17,11 @@ export class LoginPage {
   mostrarClave = false;
   mensaje = "";
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ingresar(formulario: NgForm): void {
     this.mensaje = "";

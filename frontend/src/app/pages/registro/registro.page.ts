@@ -31,7 +31,7 @@ export class RegistroPage {
     "Casablanca"
   ];
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
 
   continuar(formulario: NgForm): void {
     if (formulario.invalid || !this.nombre.trim()) {
@@ -64,6 +64,7 @@ export class RegistroPage {
       nombre: this.nombre,
       email: this.correo,
       password: this.clave,
+      comuna: this.comuna,
     }).subscribe({
       next: () => {
         this.mensaje = "Cuenta creada con exito. Ya puedes iniciar sesion.";
