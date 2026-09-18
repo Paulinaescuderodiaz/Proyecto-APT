@@ -2,6 +2,7 @@
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+// Marca de desarrollo; las URL actuales de la API están definidas en los servicios.
 export const environment = {
   production: false
 };

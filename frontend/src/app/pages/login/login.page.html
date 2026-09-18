@@ -11,6 +11,7 @@
         Ingresa para cuidar de tus mascotas y conectar con la comunidad.
       </p>
 
+      <!-- ngModel conecta los campos con LoginPage. ngSubmit ejecuta ingresar; novalidate deja los avisos a Angular. -->
       <form #formulario="ngForm"
             (ngSubmit)="ingresar(formulario)"
             novalidate>
@@ -32,6 +33,7 @@
             (campoCorreo.touched || formulario.submitted)"
         />
 
+        <!-- Los errores de formato aparecen al tocar el campo o intentar enviar el formulario. -->
         <div id="error-correo" class="error" aria-live="polite">
           @if (campoCorreo.invalid &&
                (campoCorreo.touched || formulario.submitted)) {
@@ -40,6 +42,7 @@
         </div>
 
         <label for="clave">Contraseña</label>
+        <!-- Mostrar/ocultar cambia solo la visibilidad; type=button evita enviar el formulario. -->
         <div class="campo-clave">
           <input
             id="clave"
@@ -76,6 +79,7 @@
           Iniciar sesión
         </button>
 
+        <!-- Aviso de la respuesta del servidor: credenciales incorrectas, conexión u otro error. -->
         <p class="mensaje" role="status">{{ mensaje }}</p>
       </form>
 

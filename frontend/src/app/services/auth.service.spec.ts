@@ -3,6 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { AuthService } from './auth.service';
 
+// Pruebas del contrato HTTP con respuestas simuladas; no realizan solicitudes al backend real.
 describe('AuthService', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;

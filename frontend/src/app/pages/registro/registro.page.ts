@@ -12,6 +12,7 @@ import { AuthService } from "../../services/auth.service";
   imports: [IonContent, FormsModule, RouterLink]
 })
 export class RegistroPage {
+  // Estado compartido por los dos formularios: datos básicos en el paso 1 y seguridad/comuna en el 2.
   paso = 1;
   nombre = "";
   correo = "";
@@ -33,6 +34,7 @@ export class RegistroPage {
 
   constructor(private authService: AuthService, private router: Router) { }
 
+  // Solo cambia al paso 2 cuando nombre y correo son válidos; todavía no crea la cuenta.
   continuar(formulario: NgForm): void {
     if (formulario.invalid || !this.nombre.trim()) {
       formulario.control.markAllAsTouched();
@@ -43,11 +45,13 @@ export class RegistroPage {
     this.paso = 2;
   }
 
+  // Permite corregir los datos básicos sin borrar lo que ya se escribió.
   volver(): void {
     this.paso = 1;
     this.mensaje = "";
   }
 
+  // Comprueba el segundo formulario, la confirmación de contraseña y una comuna del catálogo.
   registrar(formulario: NgForm): void {
     this.mensaje = "";
 
@@ -60,6 +64,7 @@ export class RegistroPage {
       return;
     }
 
+    // Envía también los datos del paso 1. La confirmación de contraseña solo se utiliza en el frontend.
     this.authService.registro({
       nombre: this.nombre,
       email: this.correo,
@@ -68,11 +73,13 @@ export class RegistroPage {
     }).subscribe({
       next: () => {
         this.mensaje = "Cuenta creada con exito. Ya puedes iniciar sesion.";
+        // Da un breve intervalo para mostrar el resultado antes de llevar al usuario al login.
         setTimeout(() => {
           this.router.navigateByUrl("/login");
         }, 1500);
       },
       error: (error) => {
+        // 409 indica correo duplicado; el resto de errores usa un mensaje general.
         if (error.status === 409) {
           this.mensaje = "Ya existe una cuenta con ese correo.";
         } else {
@@ -82,6 +89,7 @@ export class RegistroPage {
     });
   }
 
+  // Restablece el paso y limpia las contraseñas cuando se abandona la vista.
   ionViewWillLeave(): void {
     this.clave = "";
     this.confirmacion = "";
