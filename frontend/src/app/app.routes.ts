@@ -1,10 +1,12 @@
 ﻿import { Routes } from '@angular/router';
+import { authGuard } from './guards/auth.guard';
 
 // Cada loadComponent carga una página bajo demanda. Estas rutas todavía no tienen guards de sesión.
 export const routes: Routes = [
   {
     // Plantilla inicial de Ionic; el login exitoso lleva a /mascotas.
     path: 'home',
+    canActivate: [authGuard],
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
   },
   {
@@ -23,6 +25,7 @@ export const routes: Routes = [
   },
   {
     path: 'mascotas',
+    canActivate: [authGuard],
     loadComponent: () => import('./pages/mascotas/mascotas.page').then(m => m.MascotasPage)
   },
 
@@ -33,6 +36,7 @@ export const routes: Routes = [
   {
     // Perfil del usuario y cierre de sesión.
     path: 'perfil',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/perfil/perfil.page').then((m) => m.PerfilPage),
   },
