@@ -1,28 +1,410 @@
-// Centra el contenido de ejemplo de Ionic en la página home.
-#container {
-  text-align: center;
+/* Colores de la vista y fondo claro, incluso con el sistema en modo oscuro. */
+:host {
+  --verde: #2d6b6b;
+  --texto: #203536;
+  --secundario: #667c7e;
+  --fondo: #faf8f5;
 
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  color: var(--texto);
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+ion-content {
+  --background: var(--fondo);
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-
-  color: #8c8c8c;
-
-  margin: 0;
+* {
+  box-sizing: border-box;
 }
 
-#container a {
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+}
+
+a {
+  color: var(--verde);
   text-decoration: none;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--verde);
+  outline-offset: 4px;
+}
+
+/* Mantiene una lectura cómoda tanto en celular como en escritorio. */
+.inicio {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 12px 20px 32px;
+}
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 62px;
+  border-bottom: 1px solid #e9e4df;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 750;
+  color: var(--texto);
+}
+
+.marca > span:last-child {
+  color: var(--verde);
+}
+
+.marca-icono {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-right: 9px;
+  border-radius: 12px;
+  background: var(--verde);
+  color: white;
+  font-size: 20px;
+}
+
+.acciones-cabecera {
+  display: flex;
+  gap: 2px;
+}
+
+.acciones-cabecera button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--secundario);
+  font-size: 21px;
+}
+
+.bienvenida {
+  padding: 22px 0 18px;
+}
+
+.bienvenida p {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--secundario);
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(22px, 5vw, 29px);
+  font-weight: 750;
+  letter-spacing: -0.6px;
+}
+
+/* Dos accesos principales con los colores de la referencia. */
+.acciones-principales {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.accion {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 158px;
+  padding: 17px 14px;
+  border: 0;
+  border-radius: 16px;
+  color: white;
+  text-align: left;
+  opacity: 1;
+}
+
+.accion::after {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: -15px;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 10%);
+}
+
+.solicitar {
+  background: #e96d54;
+}
+
+.donar {
+  background: var(--verde);
+}
+
+.icono-accion {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 17%);
+  font-size: 23px;
+}
+
+.accion-etiqueta {
+  margin-bottom: 4px;
+  font-size: 12px;
+}
+
+.accion strong {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.proximamente {
+  margin-top: 10px;
+  font-size: 11px;
+}
+
+/* Encabezados compartidos por mascotas y solicitudes. */
+.seccion {
+  margin-top: 28px;
+}
+
+.titulo-seccion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.titulo-seccion a,
+.etiqueta-pendiente {
+  font-size: 12px;
+}
+
+.titulo-seccion a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.etiqueta-pendiente {
+  color: var(--secundario);
+}
+
+/* Carrusel horizontal: conserva el tamaño de las tarjetas en celulares. */
+.lista-mascotas {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 2px 2px 12px;
+  scroll-snap-type: x proximity;
+}
+
+.tarjeta-mascota {
+  flex: 0 0 158px;
+  overflow: hidden;
+  border: 1px solid #e6dfd8;
+  border-radius: 13px;
+  background: white;
+  box-shadow: 0 2px 5px rgb(32 53 54 / 5%);
+  scroll-snap-align: start;
+}
+
+.foto-mascota {
+  display: grid;
+  place-items: center;
+  height: 125px;
+  background: #e4eeee;
+  color: var(--verde);
+  font-size: 42px;
+}
+
+.foto-mascota img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.datos-mascota {
+  padding: 12px;
+}
+
+.datos-mascota h3 {
+  margin: 0 0 5px;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.datos-mascota p {
+  margin: 0;
+  color: var(--secundario);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.tarjeta-agregar {
+  flex: 0 0 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 190px;
+  padding: 14px;
+  border: 1px dashed #a7bcbc;
+  border-radius: 13px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.tarjeta-agregar ion-icon {
+  font-size: 30px;
+}
+
+.estado {
+  padding: 16px;
+  border-radius: 12px;
+  background: #edf3f2;
+  color: var(--secundario);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.estado-error {
+  background: #fff0eb;
+  color: #9e3427;
+}
+
+.estado-error p {
+  margin-top: 0;
+}
+
+.estado-error a {
+  display: inline-block;
+  padding: 10px 0;
+}
+
+.enlace {
+  min-height: 44px;
+  margin-right: 16px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--verde);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Estado informativo mientras se implementa el módulo de solicitudes. */
+.solicitudes-vacias {
+  padding: 25px 20px;
+  border: 1px solid #e6dfd8;
+  border-radius: 14px;
+  background: white;
+  text-align: center;
+}
+
+.icono-solicitudes {
+  display: inline-grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #eaf3f2;
+  color: var(--verde);
+  font-size: 26px;
+}
+
+.solicitudes-vacias h3 {
+  margin: 12px 0 8px;
+  font-size: 15px;
+}
+
+.solicitudes-vacias p {
+  max-width: 360px;
+  margin: 0 auto;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--secundario);
+}
+
+/* Barra inferior con espacio para la zona segura de los celulares. */
+ion-footer {
+  background: white;
+  border-top: 1px solid #e5e9e7;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.menu-inferior {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 6px 4px;
+}
+
+.menu-inferior a,
+.menu-inferior button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 56px;
+  padding: 5px 0;
+  border: 0;
+  background: transparent;
+  color: var(--secundario);
+  font-size: 10px;
+}
+
+.menu-inferior ion-icon {
+  font-size: 23px;
+}
+
+.menu-inferior .activo {
+  color: var(--verde);
+  font-weight: 700;
+}
+
+.menu-inferior button:disabled {
+  opacity: 0.55;
+}
+
+@media (min-width: 600px) {
+  .inicio {
+    padding-right: 28px;
+    padding-left: 28px;
+  }
+
+  .accion {
+    padding: 20px;
+  }
+
+  .tarjeta-mascota {
+    flex-basis: 180px;
+  }
+
+  .foto-mascota {
+    height: 145px;
+  }
 }

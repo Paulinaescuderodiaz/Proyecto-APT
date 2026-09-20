@@ -22,7 +22,7 @@ export class LoginPage {
     private authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   // Valida los campos antes de solicitar una sesión al backend.
   ingresar(formulario: NgForm): void {
@@ -42,7 +42,8 @@ export class LoginPage {
       })
       .subscribe({
         next: () => {
-          this.router.navigateByUrl("/mascotas");
+          // Después de iniciar sesión, muestra la pantalla de inicio.
+          this.router.navigateByUrl("/home");
         },
         error: (error) => {
           // 401: credenciales rechazadas; 0: fallo de conexión; los demás casos muestran un aviso general.

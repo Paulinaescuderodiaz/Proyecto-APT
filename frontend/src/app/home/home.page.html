@@ -1,21 +1,164 @@
-<!-- Plantilla inicial de Ionic conservada en /home. La pantalla funcional tras el login es /mascotas. -->
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content>
+  <main class="inicio">
+    <!-- Marca y accesos reservados para futuras funciones. -->
+    <header class="cabecera">
+      <a class="marca" routerLink="/home" aria-label="Pethub, inicio">
+        <span class="marca-icono">
+          <ion-icon name="paw-outline" aria-hidden="true"></ion-icon>
+        </span>
+        Pet<span>hub</span>
+      </a>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+      <div class="acciones-cabecera">
+        <button
+          type="button"
+          disabled
+          title="Próximamente"
+          aria-label="Mensajes, próximamente"
+        >
+          <ion-icon name="chatbubble-outline" aria-hidden="true"></ion-icon>
+        </button>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+        <button
+          type="button"
+          disabled
+          title="Próximamente"
+          aria-label="Notificaciones, próximamente"
+        >
+          <ion-icon name="notifications-outline" aria-hidden="true"></ion-icon>
+        </button>
+      </div>
+    </header>
+
+    <section class="bienvenida" aria-labelledby="titulo-inicio">
+      <p>Hola{{ nombreUsuario ? ', ' + nombreUsuario : '' }} 👋</p>
+      <h1 id="titulo-inicio">Tus mascotas te esperan</h1>
+    </section>
+
+    <!-- Se conserva el diseño, pero estas acciones aún no están disponibles. -->
+    <section class="acciones-principales" aria-label="Donaciones">
+      <button type="button" class="accion solicitar" disabled>
+        <span class="icono-accion">
+          <ion-icon name="water-outline" aria-hidden="true"></ion-icon>
+        </span>
+        <span class="accion-etiqueta">Solicitar</span>
+        <strong>Necesito un donante</strong>
+        <span class="proximamente">Próximamente</span>
+      </button>
+
+      <button type="button" class="accion donar" disabled>
+        <span class="icono-accion">
+          <ion-icon name="heart-outline" aria-hidden="true"></ion-icon>
+        </span>
+        <span class="accion-etiqueta">Inscribir</span>
+        <strong>Mi mascota donante</strong>
+        <span class="proximamente">Próximamente</span>
+      </button>
+    </section>
+
+    <section class="seccion" aria-labelledby="titulo-mascotas">
+      <div class="titulo-seccion">
+        <h2 id="titulo-mascotas">Mis mascotas</h2>
+        <a routerLink="/mascotas">Ver todas</a>
+      </div>
+
+      <!-- Distingue carga, error y lista vacía para evitar confundir al usuario. -->
+      @if (cargando) {
+        <p class="estado" role="status">Cargando tus mascotas…</p>
+      } @else if (mensaje) {
+        <div class="estado estado-error" role="alert">
+          <p>{{ mensaje }}</p>
+          <button type="button" class="enlace" (click)="cargarMascotas()">
+            Reintentar
+          </button>
+          <a routerLink="/login">Ir al inicio de sesión</a>
+        </div>
+      } @else {
+        @if (mascotas.length === 0) {
+          <p class="estado">
+            Tu familia peluda va aquí. Agrega tu primera mascota.
+          </p>
+        }
+
+        <!-- Las tarjetas muestran los datos reales recibidos del backend. -->
+        <div class="lista-mascotas">
+          @for (mascota of mascotas; track mascota.id) {
+            <article class="tarjeta-mascota">
+              <div class="foto-mascota">
+                @if (mascota.foto) {
+                  <img
+                    [src]="mascota.foto"
+                    [alt]="'Foto de ' + mascota.nombre"
+                    (error)="ocultarFotoConError(mascota)"
+                  />
+                } @else {
+                  <ion-icon name="paw-outline" aria-hidden="true"></ion-icon>
+                }
+              </div>
+
+              <div class="datos-mascota">
+                <h3>{{ mascota.nombre }}</h3>
+                <p>{{ mascota.raza || mascota.especie }}</p>
+              </div>
+            </article>
+          }
+
+          <!-- Lleva a la gestión existente, donde se puede agregar una mascota. -->
+          <a class="tarjeta-agregar" routerLink="/mascotas">
+            <ion-icon name="add-outline" aria-hidden="true"></ion-icon>
+            <span>Gestionar mascotas</span>
+          </a>
+        </div>
+      }
+    </section>
+
+    <section class="seccion" aria-labelledby="titulo-solicitudes">
+      <div class="titulo-seccion">
+        <h2 id="titulo-solicitudes">Solicitudes activas</h2>
+        <span class="etiqueta-pendiente">Próximamente</span>
+      </div>
+
+      <!-- No presentamos solicitudes ficticias como si fueran reales. -->
+      <div class="solicitudes-vacias">
+        <span class="icono-solicitudes">
+          <ion-icon name="heart-outline" aria-hidden="true"></ion-icon>
+        </span>
+        <h3>Una comunidad para ayudar</h3>
+        <p>
+          Pronto podrás consultar solicitudes de donación y encontrar
+          mascotas que necesitan apoyo.
+        </p>
+      </div>
+    </section>
+  </main>
 </ion-content>
+
+<!-- El footer queda fuera del contenido para no taparlo al desplazarse. -->
+<ion-footer class="ion-no-border">
+  <nav class="menu-inferior" aria-label="Navegación principal">
+    <a routerLink="/home" class="activo" aria-current="page">
+      <ion-icon name="home-outline" aria-hidden="true"></ion-icon>
+      <span>Inicio</span>
+    </a>
+
+    <a routerLink="/mascotas">
+      <ion-icon name="paw-outline" aria-hidden="true"></ion-icon>
+      <span>Mascotas</span>
+    </a>
+
+    <button type="button" disabled aria-label="Donaciones, próximamente">
+      <ion-icon name="water-outline" aria-hidden="true"></ion-icon>
+      <span>Donaciones</span>
+    </button>
+
+    <button type="button" disabled aria-label="Comunidad, próximamente">
+      <ion-icon name="people-outline" aria-hidden="true"></ion-icon>
+      <span>Comunidad</span>
+    </button>
+
+    <button type="button" disabled aria-label="Perfil, próximamente">
+      <ion-icon name="person-outline" aria-hidden="true"></ion-icon>
+      <span>Perfil</span>
+    </button>
+  </nav>
+</ion-footer>
