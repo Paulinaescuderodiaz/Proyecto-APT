@@ -1,0 +1,37 @@
+<ion-content>
+  <main class="perfil">
+    <a routerLink="/home" class="volver">← Inicio</a>
+
+    <header>
+      <p class="marca">Pethub</p>
+      <h1>Mi perfil</h1>
+      <p class="descripcion">La información de tu cuenta.</p>
+    </header>
+
+    <!-- Datos guardados al iniciar sesión; por ahora son de solo lectura. -->
+    <section class="tarjeta" aria-labelledby="titulo-datos">
+      <h2 id="titulo-datos">Datos personales</h2>
+
+      <dl>
+        <div>
+          <dt>Nombre</dt>
+          <dd>{{ nombre || 'Sin información' }}</dd>
+        </div>
+
+        <div>
+          <dt>Correo electrónico</dt>
+          <dd>{{ correo || 'Sin información' }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- Cerrar sesión no elimina la cuenta ni las mascotas. -->
+    <button
+      type="button"
+      class="cerrar-sesion"
+      (click)="cerrarSesion()"
+    >
+      Cerrar sesión
+    </button>
+  </main>
+</ion-content>

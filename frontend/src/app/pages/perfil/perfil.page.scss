@@ -1,0 +1,98 @@
+/* Fondo y colores explícitos para mantener la lectura en modo oscuro. */
+ion-content {
+  --background: #faf8f5;
+  --color: #203536;
+}
+
+.perfil {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+.volver {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-bottom: 16px;
+  color: #2d6b6b;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.marca {
+  color: #2d6b6b;
+  font-weight: 700;
+}
+
+h1,
+h2 {
+  color: #203536;
+}
+
+h1 {
+  margin: 8px 0;
+  font-size: 28px;
+}
+
+.descripcion {
+  color: #667c7e;
+  line-height: 1.5;
+}
+
+.tarjeta {
+  margin-top: 28px;
+  padding: 24px;
+  border: 1px solid #e6dfd8;
+  border-radius: 16px;
+  background: white;
+}
+
+h2 {
+  margin: 0 0 22px;
+  font-size: 18px;
+}
+
+dl {
+  margin: 0;
+}
+
+dl div + div {
+  margin-top: 22px;
+}
+
+dt {
+  margin-bottom: 6px;
+  color: #667c7e;
+  font-size: 13px;
+}
+
+dd {
+  margin: 0;
+  color: #203536;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.cerrar-sesion {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 24px;
+  border: 1px solid #b42318;
+  border-radius: 12px;
+  background: transparent;
+  color: #b42318;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cerrar-sesion:hover {
+  background: #fff0eb;
+}
+
+.volver:focus-visible,
+.cerrar-sesion:focus-visible {
+  outline: 3px solid #2d6b6b;
+  outline-offset: 4px;
+}

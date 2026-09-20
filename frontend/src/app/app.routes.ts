@@ -15,20 +15,26 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    loadComponent: () => import('./pages/login/login.page').then( m => m.LoginPage)
+    loadComponent: () => import('./pages/login/login.page').then(m => m.LoginPage)
   },
   {
     path: 'registro',
-    loadComponent: () => import('./pages/registro/registro.page').then( m => m.RegistroPage)
+    loadComponent: () => import('./pages/registro/registro.page').then(m => m.RegistroPage)
   },
   {
     path: 'mascotas',
-    loadComponent: () => import('./pages/mascotas/mascotas.page').then( m => m.MascotasPage)
+    loadComponent: () => import('./pages/mascotas/mascotas.page').then(m => m.MascotasPage)
   },
 
   {
     path: 'bienvenida',
-    loadComponent: () => import('./pages/bienvenida/bienvenida.page').then( m => m.BienvenidaPage)
+    loadComponent: () => import('./pages/bienvenida/bienvenida.page').then(m => m.BienvenidaPage)
+  },
+  {
+    // Perfil del usuario y cierre de sesión.
+    path: 'perfil',
+    loadComponent: () =>
+      import('./pages/perfil/perfil.page').then((m) => m.PerfilPage),
   },
 ];
 
