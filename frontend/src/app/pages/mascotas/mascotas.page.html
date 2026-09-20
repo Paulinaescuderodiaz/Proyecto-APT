@@ -44,6 +44,10 @@
       </section>
     </section>
     } @else {
+    <!-- Regresa al inicio cuando se está viendo el listado. -->
+    @if (!mostrarFormulario) {
+    <a routerLink="/home" class="volver-inicio">← Inicio</a>
+    }
     <header class="encabezado">
       <div>
         <p class="marca">Pethub</p>
@@ -51,11 +55,11 @@
         <p>Su bienestar comienza contigo.</p>
       </div>
 
-        @if (!mostrarFormulario && mascotas.length > 0) {
-  <button type="button" class="boton-agregar" aria-label="Agregar mascota" (click)="abrirFormulario()">
-    +
-  </button>
-  }
+      @if (!mostrarFormulario && mascotas.length > 0) {
+      <button type="button" class="boton-agregar" aria-label="Agregar mascota" (click)="abrirFormulario()">
+        +
+      </button>
+      }
     </header>
 
     @if (mostrarFormulario) {

@@ -326,3 +326,20 @@ button:disabled {
   opacity: 0.6;
   cursor: wait;
 }
+
+/* Acceso al inicio desde el listado de mascotas. */
+.volver-inicio {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-bottom: 12px;
+  color: #2d6b6b;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.volver-inicio:focus-visible {
+  outline: 2px solid #2d6b6b;
+  outline-offset: 4px;
+}

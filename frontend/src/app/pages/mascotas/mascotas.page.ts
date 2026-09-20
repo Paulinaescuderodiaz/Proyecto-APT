@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { IonContent } from '@ionic/angular';
 import { MascotaService } from '../../services/mascota.service';
+import { RouterLink } from '@angular/router';
 
 // Modelo de la vista: los valores null de la API se convierten en cadenas vacías al cargar.
 interface Mascota {
@@ -17,7 +18,7 @@ interface Mascota {
   standalone: true,
   templateUrl: './mascotas.page.html',
   styleUrls: ['./mascotas.page.scss'],
-  imports: [IonContent, FormsModule],
+  imports: [IonContent, FormsModule, RouterLink],
 })
 export class MascotasPage implements OnInit {
   // Estado de pantalla: colección obtenida de la API y visibilidad del formulario.
