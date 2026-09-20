@@ -408,3 +408,10 @@ ion-footer {
     height: 145px;
   }
 }
+
+/* Asegura que los títulos sean legibles sobre el fondo claro. */
+.inicio h1,
+.inicio h2,
+.inicio h3 {
+  color: #203536 !important;
+}
