@@ -23,6 +23,7 @@ model Usuario {
   comuna    String?
   createdAt DateTime  @default(now()) // fecha en que se creó la cuenta, se llena sola
   mascotas  Mascota[] // lado inverso: un usuario puede tener muchas mascotas
+  pushToken String? // token del dispositivo para notificaciones push (vacío hasta que el frontend lo implemente)
 }
 
 // Representa a cada mascota registrada por un usuario
@@ -51,6 +52,7 @@ model Vacuna {
   mascotaId             Int
   mascota               Mascota   @relation(fields: [mascotaId], references: [id])
   createdAt             DateTime  @default(now())
+  recordatorios Recordatorio[]
 }
 
 // Representa cada enfermedad/diagnóstico y su tratamiento — S2-HU05
@@ -75,4 +77,14 @@ model Documento {
   registroMedicoId Int
   registroMedico   RegistroMedico  @relation(fields: [registroMedicoId], references: [id])
   createdAt        DateTime        @default(now())
+}
+
+// Registra cada intento de recordatorio de vacuna — S2-HU07
+model Recordatorio {
+  id         Int      @id @default(autoincrement())
+  vacunaId   Int
+  vacuna     Vacuna   @relation(fields: [vacunaId], references: [id])
+  estado     String   // "enviado" (escenario 1) o "fallido" (escenario 2)
+  fechaEnvio DateTime @default(now())
+  visto      Boolean  @default(false) // si el usuario ya lo vio dentro de la app
 }

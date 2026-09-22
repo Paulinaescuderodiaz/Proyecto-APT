@@ -12,6 +12,7 @@ const mascotaRoutes = require("./routes/mascota.routes"); // crear/listar/editar
 const vacunaRoutes = require("./routes/vacuna.routes"); // crear/listar/editar vacunas
 const registroMedicoRoutes = require("./routes/registroMedico.routes"); // crear/listar diagnósticos y tratamientos
 const documentoRoutes = require("./routes/documento.routes"); // subir fotos/PDFs asociados a un registro médico
+const recordatorioRoutes = require("./routes/recordatorio.routes"); // revisión de vacunas próximas y recordatorios
 
 const app = express(); // crea la aplicación Express propiamente tal
 
@@ -50,6 +51,7 @@ app.use("/api/mascotas", mascotaRoutes);                    // ej: GET /api/masc
 app.use("/api/vacunas", vacunaRoutes);                       // ej: POST /api/vacunas
 app.use("/api/registros-medicos", registroMedicoRoutes);    // ej: POST /api/registros-medicos
 app.use("/api/documentos", documentoRoutes);                 // ej: POST /api/documentos
+app.use("/api/recordatorios", recordatorioRoutes);           // ej: GET /api/recordatorios/pendientes
 
 // Se exporta "app" (sin llamar a .listen() aquí) para que:
 // 1) index.js pueda importarla y hacerla escuchar en un puerto real, y
