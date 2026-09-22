@@ -5,7 +5,7 @@ Aplicación para organizar el cuidado de mascotas y desarrollar una comunidad de
 ## Equipo
 
 - **Paulina Escudero:** frontend.
-- **Evelin:** backend.
+- **Evelyn:** backend.
 
 ## Estado actual
 
