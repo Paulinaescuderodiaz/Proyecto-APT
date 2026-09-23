@@ -2,7 +2,8 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { IonContent } from '@ionic/angular';
 import { MascotaService } from '../../services/mascota.service';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { HistorialMedicoComponent } from '../../components/historial-medico.component';
 
 // Modelo de la vista: los valores null de la API se convierten en cadenas vacías al cargar.
 interface Mascota {
@@ -18,7 +19,13 @@ interface Mascota {
   standalone: true,
   templateUrl: './mascotas.page.html',
   styleUrls: ['./mascotas.page.scss'],
-  imports: [IonContent, FormsModule, RouterLink],
+  imports: [
+    IonContent,
+    FormsModule,
+    RouterLink,
+    HistorialMedicoComponent,
+  ],
+
 })
 export class MascotasPage implements OnInit {
   // Estado de pantalla: colección obtenida de la API y visibilidad del formulario.
@@ -42,20 +49,24 @@ export class MascotasPage implements OnInit {
 
   constructor(
     private mascotaService: MascotaService,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute
+  ) { }
 
   // Carga inicial del componente.
   ngOnInit(): void {
     this.cargarMascotas();
   }
 
-  // Refresca al entrar o regresar a esta vista. En la primera entrada también se ejecuta ngOnInit.
+  // Al entrar, restablece la vista y consulta las mascotas del usuario.
   ionViewWillEnter(): void {
+    this.mascotaSeleccionada = null;
+    this.mostrarFormulario = false;
+    this.editandoId = null;
     this.cargarMascotas();
   }
 
-  // Recupera datos persistidos para reconstruir el listado, incluso después de recargar la página.
+  // Carga las mascotas y abre la ficha solicitada desde Inicio.
   cargarMascotas(): void {
     this.mascotaService.listar().subscribe({
       next: (mascotasBackend) => {
@@ -66,6 +77,17 @@ export class MascotasPage implements OnInit {
           raza: m.raza ?? '',
           foto: m.foto ?? '',
         }));
+
+        // Ejemplo de URL: /mascotas?mascotaId=1.
+        const parametro = this.route.snapshot.queryParamMap.get('mascotaId');
+        const mascotaId = Number(parametro);
+
+        // Busca únicamente entre las mascotas devueltas para este usuario.
+        if (parametro && Number.isInteger(mascotaId) && mascotaId > 0) {
+          this.mascotaSeleccionada =
+            this.mascotas.find((mascota) => mascota.id === mascotaId) ?? null;
+        }
+
         this.cdr.detectChanges();
       },
       error: (error) => {

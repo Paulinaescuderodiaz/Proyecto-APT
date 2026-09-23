@@ -415,3 +415,16 @@ ion-footer {
 .inicio h3 {
   color: #203536 !important;
 }
+
+/* La tarjeta es un enlace y conserva el aspecto de la ficha. */
+a.tarjeta-mascota {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a.tarjeta-mascota:focus-visible {
+  outline: 3px solid #2d7071;
+  outline-offset: 3px;
+}

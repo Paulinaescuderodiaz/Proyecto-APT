@@ -14,7 +14,6 @@ import {
   notificationsOutline,
 } from 'ionicons/icons';
 import { Subscription } from 'rxjs';
-
 import {
   MascotaService,
   MascotaBackend,
@@ -33,14 +32,14 @@ export class HomePage {
   cargando = false;
   mensaje = '';
 
-  // Permite cancelar la consulta cuando el usuario abandona la pantalla.
+  // Permite cancelar la consulta al abandonar la pantalla.
   private consulta?: Subscription;
 
   constructor(
     private mascotaService: MascotaService,
     private cdr: ChangeDetectorRef
   ) {
-    // Registra los iconos utilizados en el HTML.
+    // Registra los iconos utilizados en la página de Inicio.
     addIcons({
       homeOutline,
       pawOutline,
@@ -54,15 +53,15 @@ export class HomePage {
     });
   }
 
-  // Ionic conserva las páginas: actualizamos los datos en cada entrada.
+  // Actualiza el saludo y las mascotas cada vez que se abre Inicio.
   ionViewWillEnter(): void {
     this.cargarNombre();
     this.cargarMascotas();
   }
 
   private cargarNombre(): void {
-    // El login guarda el usuario de la sesión en el almacenamiento local.
-    // Este nombre sirve para el saludo; no autoriza el acceso a la API.
+    // Recupera el nombre guardado al iniciar sesión.
+    // Este dato se usa para el saludo; no autoriza solicitudes al backend.
     this.nombreUsuario = '';
 
     try {
@@ -74,20 +73,23 @@ export class HomePage {
         this.nombreUsuario = usuario.nombre.trim().split(/\s+/)[0];
       }
     } catch {
-      // Si el dato no es válido, el HTML muestra un saludo general.
+      // Si los datos guardados no son válidos, muestra un saludo general.
       this.nombreUsuario = '';
     }
   }
 
   cargarMascotas(): void {
+    // Cancela una consulta anterior antes de comenzar otra.
     this.consulta?.unsubscribe();
+
     this.cargando = true;
     this.mensaje = '';
     this.mascotas = [];
 
-    // El servicio envía el token; el backend devuelve las mascotas del dueño.
+    // El backend devuelve las mascotas pertenecientes al usuario.
     this.consulta = this.mascotaService.listar().subscribe({
       next: (mascotas) => {
+        // Conserva todos los campos del modelo MascotaBackend.
         this.mascotas = mascotas;
         this.cargando = false;
         this.cdr.detectChanges();
@@ -100,18 +102,18 @@ export class HomePage {
             ? 'Tu sesión no es válida. Vuelve a iniciar sesión.'
             : 'No pudimos cargar tus mascotas. Intenta nuevamente.';
 
-        // Actualiza el aviso al recibir la respuesta de la API.
         this.cdr.detectChanges();
       },
     });
   }
 
   ocultarFotoConError(mascota: MascotaBackend): void {
-    // Si una imagen falla, mostramos una huella como alternativa.
+    // Si la imagen no carga, el HTML muestra una huella.
     mascota.foto = null;
   }
 
   ionViewWillLeave(): void {
+    // Detiene la consulta cuando se abandona Inicio.
     this.consulta?.unsubscribe();
   }
 }

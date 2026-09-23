@@ -1,0 +1,114 @@
+<section class="historial" aria-labelledby="titulo-historial">
+  <header>
+    <h2 id="titulo-historial">Historial médico</h2>
+    <p>Guarda los diagnósticos y tratamientos indicados por el veterinario.</p>
+  </header>
+
+  <!-- Distingue un fallo de conexión de un historial realmente vacío. -->
+  @if (cargando) {
+    <p role="status">Cargando historial médico…</p>
+  } @else if (errorCarga) {
+    <div class="aviso-error" role="alert">
+      <p>{{ errorCarga }}</p>
+      <button type="button" class="secundario" (click)="cargarHistorial()">
+        Reintentar
+      </button>
+    </div>
+  } @else {
+    <form
+      #formulario="ngForm"
+      (ngSubmit)="guardar(formulario)"
+      novalidate
+    >
+      <h3>Agregar registro médico</h3>
+
+      <!-- Deshabilita los campos mientras se procesa el envío. -->
+      <fieldset [disabled]="guardando">
+        <legend class="solo-lectores">Datos del registro médico</legend>
+
+        <label for="diagnostico">Diagnóstico</label>
+        <input
+          id="diagnostico"
+          name="diagnostico"
+          type="text"
+          [(ngModel)]="diagnostico"
+          #campoDiagnostico="ngModel"
+          required
+          placeholder="Diagnóstico indicado por el veterinario"
+          aria-describedby="error-diagnostico"
+          [attr.aria-invalid]="
+            !diagnostico.trim() && (campoDiagnostico.touched || enviado)
+          "
+        />
+
+        <div id="error-diagnostico" aria-live="polite">
+          @if (!diagnostico.trim() && (campoDiagnostico.touched || enviado)) {
+            <p class="error">Debes indicar un diagnóstico</p>
+          }
+        </div>
+
+        <label for="fecha-registro">Fecha</label>
+        <input
+          id="fecha-registro"
+          name="fecha"
+          type="date"
+          [(ngModel)]="fecha"
+          #campoFecha="ngModel"
+          required
+          aria-describedby="error-fecha"
+          [attr.aria-invalid]="
+            campoFecha.invalid && (campoFecha.touched || enviado)
+          "
+        />
+
+        <div id="error-fecha" aria-live="polite">
+          @if (campoFecha.invalid && (campoFecha.touched || enviado)) {
+            <p class="error">Debes indicar una fecha válida.</p>
+          }
+        </div>
+
+        <label for="tratamiento">Tratamiento (opcional)</label>
+        <textarea
+          id="tratamiento"
+          name="tratamiento"
+          [(ngModel)]="tratamiento"
+          rows="4"
+          placeholder="Escribe las indicaciones del veterinario"
+        ></textarea>
+
+        <button type="submit" class="primario">
+          {{ guardando ? 'Guardando…' : 'Guardar registro médico' }}
+        </button>
+      </fieldset>
+    </form>
+
+    @if (errorGuardado) {
+      <p class="error" role="alert">{{ errorGuardado }}</p>
+    }
+
+    @if (mensajeExito) {
+      <p class="exito" role="status">{{ mensajeExito }}</p>
+    }
+
+    <div class="registros">
+      <h3>Registros anteriores</h3>
+
+      <!-- UTC evita que una fecha sin hora se muestre como el día anterior en Chile. -->
+      @for (registro of registros; track registro.id) {
+        <article class="registro">
+          <time [attr.datetime]="registro.fecha">
+            {{ registro.fecha | date:'dd/MM/yyyy':'UTC' }}
+          </time>
+
+          <h4>{{ registro.diagnostico }}</h4>
+          <p class="etiqueta">Tratamiento</p>
+          <p class="tratamiento">
+            {{ registro.tratamiento || 'Sin tratamiento registrado.' }}
+          </p>
+        </article>
+      } @empty {
+        <p class="vacio">Esta mascota aún no tiene registros médicos.</p>
+      }
+    </div>
+  }
+</section>

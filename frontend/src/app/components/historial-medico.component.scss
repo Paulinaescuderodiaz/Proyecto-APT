@@ -1,0 +1,164 @@
+/* Estilos propios para no alterar los formularios de mascotas. */
+:host {
+  display: block;
+  margin-top: 28px;
+  color: #203536;
+}
+
+.historial {
+  padding: 22px;
+  border: 1px solid #e6dfd8;
+  border-radius: 16px;
+  background: #fff;
+}
+
+h2,
+h3,
+h4 {
+  color: #203536;
+}
+
+h2 {
+  margin: 0 0 10px;
+  font-size: 22px;
+}
+
+h3 {
+  margin: 24px 0 18px;
+  font-size: 18px;
+}
+
+header p,
+.vacio {
+  color: #667c7e;
+  line-height: 1.6;
+}
+
+fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+label {
+  display: block;
+  margin: 16px 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+input,
+textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #c8d3d0;
+  border-radius: 10px;
+  background: #fff;
+  color: #203536;
+  font: inherit;
+  color-scheme: light;
+}
+
+textarea {
+  resize: vertical;
+}
+
+button {
+  min-height: 44px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primario {
+  width: 100%;
+  margin-top: 20px;
+  border: 0;
+  background: #2d6b6b;
+  color: white;
+}
+
+.secundario {
+  border: 1px solid #2d6b6b;
+  background: white;
+  color: #2d6b6b;
+}
+
+fieldset:disabled {
+  opacity: 0.65;
+}
+
+fieldset:disabled button {
+  cursor: wait;
+}
+
+.error,
+.aviso-error {
+  color: #b42318;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.exito {
+  padding: 12px;
+  border-radius: 10px;
+  background: #edf6ef;
+  color: #25633b;
+}
+
+.registros {
+  margin-top: 28px;
+  border-top: 1px solid #e6dfd8;
+}
+
+.registro {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid #e0e7e4;
+  border-radius: 12px;
+}
+
+time,
+.etiqueta {
+  color: #667c7e;
+  font-size: 13px;
+}
+
+h4 {
+  margin: 10px 0;
+  font-size: 17px;
+  overflow-wrap: anywhere;
+}
+
+.etiqueta {
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.tratamiento {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+  outline: 2px solid #2d6b6b;
+  outline-offset: 3px;
+}
+
+/* Mantiene una descripción accesible del grupo de campos. */
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}

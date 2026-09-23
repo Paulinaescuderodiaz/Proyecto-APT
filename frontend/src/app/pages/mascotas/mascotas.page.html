@@ -1,178 +1,259 @@
 <ion-content>
   <main class="pagina">
-    <!-- La selección tiene prioridad: muestra detalle; sin selección, alterna formulario y listado. -->
+    <!-- Si hay una mascota seleccionada, muestra su ficha e historial. -->
     @if (mascotaSeleccionada; as mascota) {
-    <section aria-labelledby="titulo-detalle">
-      <button type="button" class="volver" (click)="volverAlListado()">
-        ← Mis mascotas
-      </button>
-
-      <div class="detalle-cabecera">
-        <div class="avatar avatar-grande" aria-hidden="true">
-          <!-- Usa la foto guardada o un emoji según la especie cuando no hay imagen. -->
-          @if (mascota.foto) {
-          <img [src]="mascota.foto" alt="" />
-          } @else {
-          {{ mascota.especie === 'Perro' ? '🐶' : '🐱' }}
-          }
-        </div>
-        <h1 id="titulo-detalle">{{ mascota.nombre }}</h1>
-        <p>Un compañero, muchos momentos juntos.</p>
-      </div>
-
-      <section class="formulario" aria-labelledby="titulo-datos">
-        <h2 id="titulo-datos">Sus datos</h2>
-
-        <dl class="datos-detalle">
-          <div>
-            <dt>Nombre</dt>
-            <dd>{{ mascota.nombre }}</dd>
-          </div>
-          <div>
-            <dt>Especie</dt>
-            <dd>{{ mascota.especie }}</dd>
-          </div>
-          <div>
-            <dt>Raza</dt>
-            <dd>{{ mascota.raza || 'Sin especificar' }}</dd>
-          </div>
-        </dl>
-
-        <button type="button" class="secundario editar" (click)="editarMascota(mascota)">
-          Editar datos
+      <section aria-labelledby="titulo-detalle">
+        <button
+          type="button"
+          class="volver"
+          (click)="volverAlListado()"
+        >
+          ← Mis mascotas
         </button>
-      </section>
-    </section>
-    } @else {
-    <!-- Regresa al inicio cuando se está viendo el listado. -->
-    @if (!mostrarFormulario) {
-    <a routerLink="/home" class="volver-inicio">← Inicio</a>
-    }
-    <header class="encabezado">
-      <div>
-        <p class="marca">Pethub</p>
-        <h1>Mis mascotas</h1>
-        <p>Su bienestar comienza contigo.</p>
-      </div>
 
-      @if (!mostrarFormulario && mascotas.length > 0) {
-      <button type="button" class="boton-agregar" aria-label="Agregar mascota" (click)="abrirFormulario()">
-        +
-      </button>
-      }
-    </header>
-
-    @if (mostrarFormulario) {
-    <section class="formulario" aria-labelledby="titulo-formulario">
-      <h2 id="titulo-formulario">
-        {{ editandoId !== null ? 'Editar mascota' : 'Agregar mascota' }}
-      </h2>
-      <p>Cuéntanos un poco sobre tu compañero.</p>
-
-      <!-- Formulario compartido para alta y edición; editandoId determina la operación al guardar. -->
-      <form #formulario="ngForm" (ngSubmit)="agregar(formulario)" novalidate>
-
-        <label for="foto">Foto de tu mascota (opcional)</label>
-
-        @if (foto) {
-        <img class="foto-preview" [src]="foto" alt="Vista previa de la foto seleccionada" />
-        }
-
-        <!-- El archivo se valida y convierte en Data URL en seleccionarFoto; accept orienta el selector. -->
-        <input id="foto" type="file" accept="image/jpeg,image/png,image/webp" [disabled]="cargandoFoto"
-          (change)="seleccionarFoto($event)" aria-describedby="ayuda-foto" />
-
-        <!-- Pendiente: el texto indica 10 MB, pero seleccionarFoto valida un máximo de 5 MB. -->
-        <p id="ayuda-foto">JPG, PNG o WebP. Máximo 10 MB.</p>
-
-        @if (cargandoFoto) {
-        <p role="status">Cargando foto…</p>
-        }
-
-        @if (errorFoto) {
-        <p class="error" role="alert">{{ errorFoto }}</p>
-        }
-        <label for="nombre">Nombre</label>
-        <input id="nombre" name="nombre" [(ngModel)]="nombre" #campoNombre="ngModel" required maxlength="60"
-          placeholder="¿Cómo se llama?" aria-describedby="error-nombre" />
-
-        @if (!nombre.trim() &&
-        (campoNombre.touched || formulario.submitted)) {
-        <p id="error-nombre" class="error" role="alert">
-          Ingresa el nombre de tu mascota.
-        </p>
-        }
-
-        <label for="especie">Especie</label>
-        <select id="especie" name="especie" [(ngModel)]="especie" #campoEspecie="ngModel" required
-          aria-describedby="error-especie">
-          <option value="" disabled>Selecciona una opción</option>
-          <option value="Perro">Perro</option>
-          <option value="Gato">Gato</option>
-        </select>
-
-        @if (campoEspecie.invalid &&
-        (campoEspecie.touched || formulario.submitted)) {
-        <p id="error-especie" class="error" role="alert">
-          Selecciona la especie.
-        </p>
-        }
-
-        <label for="raza">Raza (opcional)</label>
-        <input id="raza" name="raza" [(ngModel)]="raza" maxlength="80" placeholder="Por ejemplo: mestizo" />
-
-        <!-- Mientras se lee la foto se deshabilitan guardar y cancelar. -->
-        <div class="acciones">
-          <button type="submit" class="primario" [disabled]="cargandoFoto">
-            {{ editandoId !== null ? 'Guardar cambios' : 'Agregar a la lista' }}
-          </button>
-
-          <button type="button" class="secundario" (click)="cancelarFormulario()" [disabled]="cargandoFoto">
-            Cancelar
-          </button>
-        </div>
-      </form>
-    </section>
-    } @else {
-    <section aria-label="Lista de mascotas">
-      <!-- El id estable identifica cada tarjeta; pulsarla abre el detalle. -->
-      @for (mascota of mascotas; track mascota.id) {
-      <button type="button" class="tarjeta" [attr.aria-label]="'Ver ficha de ' + mascota.nombre"
-        (click)="verDetalle(mascota)">
-        <div class="avatar" aria-hidden="true">
-          @if (mascota.foto) {
-          <img [src]="mascota.foto" alt="" />
-          } @else {
-          {{ mascota.especie === 'Perro' ? '🐶' : '🐱' }}
-          }
-        </div>
-
-        <div class="datos">
-          <h2>{{ mascota.nombre }}</h2>
-          <p>
-            {{ mascota.especie }}
-            @if (mascota.raza) {
-            · {{ mascota.raza }}
+        <div class="detalle-cabecera">
+          <div class="avatar avatar-grande" aria-hidden="true">
+            <!-- Usa la foto guardada o un emoji según la especie. -->
+            @if (mascota.foto) {
+              <img [src]="mascota.foto" alt="" />
+            } @else {
+              {{ mascota.especie === 'Perro' ? '🐶' : '🐱' }}
             }
-          </p>
-          <span class="etiqueta">Mi compañero</span>
+          </div>
+
+          <h1 id="titulo-detalle">{{ mascota.nombre }}</h1>
+          <p>Un compañero, muchos momentos juntos.</p>
         </div>
-      </button>
-      } @empty {
-      <!-- Estado vacío cuando la colección no contiene mascotas. -->
-      <div class="vacio">
-        <div class="huella" aria-hidden="true">🐾</div>
-        <h2>Tu familia peluda va aquí</h2>
-        <p>
-          Agrega a tu primera mascota y comienza a organizar su cuidado.
-        </p>
-        <button type="button" class="primario" (click)="abrirFormulario()">
-          Agregar mascota
-        </button>
-      </div>
+
+        <section class="formulario" aria-labelledby="titulo-datos">
+          <h2 id="titulo-datos">Sus datos</h2>
+
+          <dl class="datos-detalle">
+            <div>
+              <dt>Nombre</dt>
+              <dd>{{ mascota.nombre }}</dd>
+            </div>
+
+            <div>
+              <dt>Especie</dt>
+              <dd>{{ mascota.especie }}</dd>
+            </div>
+
+            <div>
+              <dt>Raza</dt>
+              <dd>{{ mascota.raza || 'Sin especificar' }}</dd>
+            </div>
+          </dl>
+
+          <button
+            type="button"
+            class="secundario editar"
+            (click)="editarMascota(mascota)"
+          >
+            Editar datos
+          </button>
+        </section>
+
+        <!-- HU05: carga el historial de la mascota seleccionada. -->
+        <app-historial-medico
+          [mascotaId]="mascota.id"
+        ></app-historial-medico>
+      </section>
+    } @else {
+      <!-- Sin selección, muestra el listado o el formulario de mascotas. -->
+      @if (!mostrarFormulario) {
+        <a routerLink="/home" class="volver-inicio">← Inicio</a>
       }
-    </section>
-    }
+
+      <header class="encabezado">
+        <div>
+          <p class="marca">Pethub</p>
+          <h1>Mis mascotas</h1>
+          <p>Su bienestar comienza contigo.</p>
+        </div>
+
+        @if (!mostrarFormulario && mascotas.length > 0) {
+          <button
+            type="button"
+            class="boton-agregar"
+            aria-label="Agregar mascota"
+            (click)="abrirFormulario()"
+          >
+            +
+          </button>
+        }
+      </header>
+
+      @if (mostrarFormulario) {
+        <section
+          class="formulario"
+          aria-labelledby="titulo-formulario"
+        >
+          <h2 id="titulo-formulario">
+            {{ editandoId !== null ? 'Editar mascota' : 'Agregar mascota' }}
+          </h2>
+
+          <p>Cuéntanos un poco sobre tu compañero.</p>
+
+          <!-- Formulario compartido para crear y editar mascotas. -->
+          <form
+            #formulario="ngForm"
+            (ngSubmit)="agregar(formulario)"
+            novalidate
+          >
+            <label for="foto">Foto de tu mascota (opcional)</label>
+
+            @if (foto) {
+              <img
+                class="foto-preview"
+                [src]="foto"
+                alt="Vista previa de la foto seleccionada"
+              />
+            }
+
+            <!-- seleccionarFoto valida y convierte la imagen en Data URL. -->
+            <input
+              id="foto"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              [disabled]="cargandoFoto"
+              (change)="seleccionarFoto($event)"
+              aria-describedby="ayuda-foto"
+            />
+
+            <p id="ayuda-foto">JPG, PNG o WebP. Máximo 5 MB.</p>
+
+            @if (cargandoFoto) {
+              <p role="status">Cargando foto…</p>
+            }
+
+            @if (errorFoto) {
+              <p class="error" role="alert">{{ errorFoto }}</p>
+            }
+
+            <label for="nombre">Nombre</label>
+            <input
+              id="nombre"
+              name="nombre"
+              [(ngModel)]="nombre"
+              #campoNombre="ngModel"
+              required
+              maxlength="60"
+              placeholder="¿Cómo se llama?"
+              aria-describedby="error-nombre"
+            />
+
+            @if (
+              !nombre.trim() &&
+              (campoNombre.touched || formulario.submitted)
+            ) {
+              <p id="error-nombre" class="error" role="alert">
+                Ingresa el nombre de tu mascota.
+              </p>
+            }
+
+            <label for="especie">Especie</label>
+            <select
+              id="especie"
+              name="especie"
+              [(ngModel)]="especie"
+              #campoEspecie="ngModel"
+              required
+              aria-describedby="error-especie"
+            >
+              <option value="" disabled>Selecciona una opción</option>
+              <option value="Perro">Perro</option>
+              <option value="Gato">Gato</option>
+            </select>
+
+            @if (
+              campoEspecie.invalid &&
+              (campoEspecie.touched || formulario.submitted)
+            ) {
+              <p id="error-especie" class="error" role="alert">
+                Selecciona la especie.
+              </p>
+            }
+
+            <label for="raza">Raza (opcional)</label>
+            <input
+              id="raza"
+              name="raza"
+              [(ngModel)]="raza"
+              maxlength="80"
+              placeholder="Por ejemplo: mestizo"
+            />
+
+            <!-- Espera a que termine la lectura de la foto. -->
+            <div class="acciones">
+              <button
+                type="submit"
+                class="primario"
+                [disabled]="cargandoFoto"
+              >
+                {{ editandoId !== null ? 'Guardar cambios' : 'Agregar a la lista' }}
+              </button>
+
+              <button
+                type="button"
+                class="secundario"
+                (click)="cancelarFormulario()"
+                [disabled]="cargandoFoto"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </section>
+      } @else {
+        <section aria-label="Lista de mascotas">
+          <!-- Cada tarjeta abre la ficha de la mascota correspondiente. -->
+          @for (mascota of mascotas; track mascota.id) {
+            <button
+              type="button"
+              class="tarjeta"
+              [attr.aria-label]="'Ver ficha de ' + mascota.nombre"
+              (click)="verDetalle(mascota)"
+            >
+              <div class="avatar" aria-hidden="true">
+                @if (mascota.foto) {
+                  <img [src]="mascota.foto" alt="" />
+                } @else {
+                  {{ mascota.especie === 'Perro' ? '🐶' : '🐱' }}
+                }
+              </div>
+
+              <div class="datos">
+                <h2>{{ mascota.nombre }}</h2>
+                <p>
+                  {{ mascota.especie }}
+                  @if (mascota.raza) {
+                    · {{ mascota.raza }}
+                  }
+                </p>
+                <span class="etiqueta">Mi compañero</span>
+              </div>
+            </button>
+          } @empty {
+            <!-- Estado vacío cuando no hay mascotas en el listado. -->
+            <div class="vacio">
+              <div class="huella" aria-hidden="true">🐾</div>
+              <h2>Tu familia peluda va aquí</h2>
+              <p>
+                Agrega a tu primera mascota y comienza a organizar su cuidado.
+              </p>
+
+              <button
+                type="button"
+                class="primario"
+                (click)="abrirFormulario()"
+              >
+                Agregar mascota
+              </button>
+            </div>
+          }
+        </section>
+      }
     }
   </main>
 </ion-content>

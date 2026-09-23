@@ -73,7 +73,9 @@
       <!-- Las tarjetas muestran los datos reales recibidos del backend. -->
       <div class="lista-mascotas">
         @for (mascota of mascotas; track mascota.id) {
-        <article class="tarjeta-mascota">
+        <!-- Abre la ficha de esta mascota enviando su identificador en la URL. -->
+        <a class="tarjeta-mascota" routerLink="/mascotas" [queryParams]="{ mascotaId: mascota.id }"
+          [attr.aria-label]="'Ver ficha de ' + mascota.nombre">
           <div class="foto-mascota">
             @if (mascota.foto) {
             <img [src]="mascota.foto" [alt]="'Foto de ' + mascota.nombre" (error)="ocultarFotoConError(mascota)" />
@@ -86,7 +88,7 @@
             <h3>{{ mascota.nombre }}</h3>
             <p>{{ mascota.raza || mascota.especie }}</p>
           </div>
-        </article>
+        </a>
         }
 
         <!-- Lleva a la gestión existente, donde se puede agregar una mascota. -->
