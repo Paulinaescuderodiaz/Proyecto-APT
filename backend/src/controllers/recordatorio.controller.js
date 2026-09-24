@@ -21,9 +21,8 @@ function enviarNotificacionPush(usuario, vacuna) {
 async function revisarVacunasProximas() {
   const hoy = new Date();
   // Calculamos el rango de fechas correspondiente a "dentro de 3 días" (todo ese día completo)
-  const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + 3, 0, 0, 0);
-  const fin = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + 3, 23, 59, 59);
-
+  const inicio = new Date(Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate() + 3, 0, 0, 0));
+const fin = new Date(Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), hoy.getUTCDate() + 3, 23, 59, 59));
   // Escenario 3: "aplicada: false" excluye automáticamente las vacunas
   // que el usuario ya marcó como aplicadas — no se les crea ningún recordatorio
   const vacunas = await prisma.vacuna.findMany({
