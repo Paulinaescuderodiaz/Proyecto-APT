@@ -1,7 +1,6 @@
-// Polyfills for running unit tests under jsdom (the default Vitest environment).
-// Ionic components such as ion-menu and ion-split-pane query `window.matchMedia`,
-// which jsdom does not implement.
-// Simula consultas de pantalla para pruebas de Ionic en jsdom; no representa el tamaño de un dispositivo real.
+import { beforeEach } from 'vitest';
+
+// Simula las consultas de pantalla que utilizan los componentes Ionic.
 if (!window.matchMedia) {
   window.matchMedia = (query: string): MediaQueryList =>
     ({
@@ -15,3 +14,51 @@ if (!window.matchMedia) {
       dispatchEvent: () => false,
     }) as MediaQueryList;
 }
+
+// Almacenamiento en memoria exclusivo de las pruebas.
+// No utiliza ni modifica la sesión del navegador real.
+const datos = new Map<string, string>();
+
+const almacenamiento: Storage = {
+  get length(): number {
+    return datos.size;
+  },
+
+  clear(): void {
+    datos.clear();
+  },
+
+  getItem(clave: string): string | null {
+    return datos.get(String(clave)) ?? null;
+  },
+
+  setItem(clave: string, valor: string): void {
+    datos.set(String(clave), String(valor));
+  },
+
+  removeItem(clave: string): void {
+    datos.delete(String(clave));
+  },
+
+  key(indice: number): string | null {
+    return Array.from(datos.keys())[indice] ?? null;
+  },
+};
+
+// Tanto localStorage como window.localStorage usan la misma simulación.
+Object.defineProperty(globalThis, 'localStorage', {
+  configurable: true,
+  value: almacenamiento,
+});
+
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'localStorage', {
+    configurable: true,
+    value: almacenamiento,
+  });
+}
+
+// Evita que una prueba herede la sesión de otra.
+beforeEach(() => {
+  almacenamiento.clear();
+});

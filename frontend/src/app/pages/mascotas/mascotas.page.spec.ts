@@ -1,18 +1,38 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { of } from 'rxjs';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { MascotasPage } from './mascotas.page';
+import { MascotaService } from '../../services/mascota.service';
 
-// Prueba básica de creación del componente; no comprueba el flujo completo de la pantalla.
+// Comprueba que la pantalla de mascotas se puede crear.
 describe('MascotasPage', () => {
   let component: MascotasPage;
   let fixture: ComponentFixture<MascotasPage>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [MascotasPage],
+      providers: [
+        // Proporciona ActivatedRoute y las dependencias de RouterLink.
+        provideRouter([]),
+
+        // ngOnInit consulta las mascotas; respondemos con una lista vacía.
+        {
+          provide: MascotaService,
+          useValue: {
+            listar: () => of([]),
+          },
+        },
+      ],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(MascotasPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('crea la pantalla de mascotas', () => {
     expect(component).toBeTruthy();
   });
 });

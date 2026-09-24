@@ -240,3 +240,10 @@ input[aria-invalid='true'] {
 .mensaje:empty {
   display: none;
 }
+
+/* Mantiene los títulos legibles sobre el fondo claro. */
+h1,
+h2,
+h3 {
+  color: var(--texto);
+}
