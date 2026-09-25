@@ -428,3 +428,35 @@ a.tarjeta-mascota:focus-visible {
   outline: 3px solid #2d7071;
   outline-offset: 3px;
 }
+
+.recordatorio {
+  margin-bottom: 12px;
+  padding: 16px;
+  border: 1px solid #cbdedd;
+  border-left: 4px solid #2e6e70;
+  border-radius: 12px;
+  background: #f0f7f6;
+  color: #263c3f;
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 16px;
+  }
+
+  p {
+    margin: 6px 0;
+    line-height: 1.5;
+  }
+
+  a {
+    display: inline-block;
+    margin-top: 8px;
+    color: #2e6e70;
+    font-weight: 600;
+  }
+
+  a:focus-visible {
+    outline: 2px solid #2e6e70;
+    outline-offset: 3px;
+  }
+}

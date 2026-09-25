@@ -1,6 +1,5 @@
 <ion-content>
   <main class="inicio">
-    <!-- Marca y accesos reservados para futuras funciones. -->
     <header class="cabecera">
       <a class="marca" routerLink="/home" aria-label="Pethub, inicio">
         <span class="marca-icono">
@@ -10,12 +9,28 @@
       </a>
 
       <div class="acciones-cabecera">
-        <button type="button" disabled title="Próximamente" aria-label="Mensajes, próximamente">
-          <ion-icon name="chatbubble-outline" aria-hidden="true"></ion-icon>
+        <button
+          type="button"
+          disabled
+          title="Próximamente"
+          aria-label="Mensajes, próximamente"
+        >
+          <ion-icon
+            name="chatbubble-outline"
+            aria-hidden="true"
+          ></ion-icon>
         </button>
 
-        <button type="button" disabled title="Próximamente" aria-label="Notificaciones, próximamente">
-          <ion-icon name="notifications-outline" aria-hidden="true"></ion-icon>
+        <button
+          type="button"
+          disabled
+          title="Los recordatorios se muestran debajo del saludo"
+          aria-label="Recordatorios disponibles en esta página"
+        >
+          <ion-icon
+            name="notifications-outline"
+            aria-hidden="true"
+          ></ion-icon>
         </button>
       </div>
     </header>
@@ -25,7 +40,68 @@
       <h1 id="titulo-inicio">Tus mascotas te esperan</h1>
     </section>
 
-    <!-- Se conserva el diseño, pero estas acciones aún no están disponibles. -->
+    <!-- HU07: avisos devueltos por el backend para esta cuenta. -->
+    <section class="seccion" aria-labelledby="titulo-recordatorios">
+      <div class="titulo-seccion">
+        <h2 id="titulo-recordatorios">Recordatorios de vacunas</h2>
+      </div>
+
+      @if (cargandoRecordatorios) {
+        <p class="estado" role="status">
+          Cargando recordatorios…
+        </p>
+      } @else if (errorRecordatorios) {
+        <div class="estado estado-error" role="alert">
+          <p>{{ errorRecordatorios }}</p>
+          <button
+            type="button"
+            class="enlace"
+            (click)="cargarRecordatorios()"
+          >
+            Reintentar
+          </button>
+        </div>
+      } @else {
+        @for (recordatorio of recordatorios; track recordatorio.id) {
+          <article class="recordatorio">
+            <h3>{{ recordatorio.vacuna.nombre }}</h3>
+
+            <p>
+              Recuerda el refuerzo de
+              <strong>
+                {{ nombreMascota(recordatorio.vacuna.mascotaId) }}
+              </strong>.
+            </p>
+
+            @if (recordatorio.vacuna.fechaProximoRefuerzo) {
+              <p>
+                Fecha:
+                <time
+                  [attr.datetime]="recordatorio.vacuna.fechaProximoRefuerzo"
+                >
+                  {{
+                    recordatorio.vacuna.fechaProximoRefuerzo
+                      | date:'dd/MM/yyyy':'UTC'
+                  }}
+                </time>
+              </p>
+            }
+
+            <a
+              routerLink="/mascotas"
+              [queryParams]="{
+                mascotaId: recordatorio.vacuna.mascotaId
+              }"
+            >
+              Ver ficha de la mascota
+            </a>
+          </article>
+        } @empty {
+          <p class="estado">No tienes recordatorios nuevos.</p>
+        }
+      }
+    </section>
+
     <section class="acciones-principales" aria-label="Donaciones">
       <button type="button" class="accion solicitar" disabled>
         <span class="icono-accion">
@@ -52,51 +128,64 @@
         <a routerLink="/mascotas">Ver todas</a>
       </div>
 
-      <!-- Distingue carga, error y lista vacía para evitar confundir al usuario. -->
       @if (cargando) {
-      <p class="estado" role="status">Cargando tus mascotas…</p>
+        <p class="estado" role="status">Cargando tus mascotas…</p>
       } @else if (mensaje) {
-      <div class="estado estado-error" role="alert">
-        <p>{{ mensaje }}</p>
-        <button type="button" class="enlace" (click)="cargarMascotas()">
-          Reintentar
-        </button>
-        <a routerLink="/login">Ir al inicio de sesión</a>
-      </div>
+        <div class="estado estado-error" role="alert">
+          <p>{{ mensaje }}</p>
+
+          <button
+            type="button"
+            class="enlace"
+            (click)="cargarMascotas()"
+          >
+            Reintentar
+          </button>
+
+          <a routerLink="/login">Ir al inicio de sesión</a>
+        </div>
       } @else {
-      @if (mascotas.length === 0) {
-      <p class="estado">
-        Tu familia peluda va aquí. Agrega tu primera mascota.
-      </p>
-      }
-
-      <!-- Las tarjetas muestran los datos reales recibidos del backend. -->
-      <div class="lista-mascotas">
-        @for (mascota of mascotas; track mascota.id) {
-        <!-- Abre la ficha de esta mascota enviando su identificador en la URL. -->
-        <a class="tarjeta-mascota" routerLink="/mascotas" [queryParams]="{ mascotaId: mascota.id }"
-          [attr.aria-label]="'Ver ficha de ' + mascota.nombre">
-          <div class="foto-mascota">
-            @if (mascota.foto) {
-            <img [src]="mascota.foto" [alt]="'Foto de ' + mascota.nombre" (error)="ocultarFotoConError(mascota)" />
-            } @else {
-            <ion-icon name="paw-outline" aria-hidden="true"></ion-icon>
-            }
-          </div>
-
-          <div class="datos-mascota">
-            <h3>{{ mascota.nombre }}</h3>
-            <p>{{ mascota.raza || mascota.especie }}</p>
-          </div>
-        </a>
+        @if (mascotas.length === 0) {
+          <p class="estado">
+            Tu familia peluda va aquí. Agrega tu primera mascota.
+          </p>
         }
 
-        <!-- Lleva a la gestión existente, donde se puede agregar una mascota. -->
-        <a class="tarjeta-agregar" routerLink="/mascotas">
-          <ion-icon name="add-outline" aria-hidden="true"></ion-icon>
-          <span>Gestionar mascotas</span>
-        </a>
-      </div>
+        <div class="lista-mascotas">
+          @for (mascota of mascotas; track mascota.id) {
+            <a
+              class="tarjeta-mascota"
+              routerLink="/mascotas"
+              [queryParams]="{ mascotaId: mascota.id }"
+              [attr.aria-label]="'Ver ficha de ' + mascota.nombre"
+            >
+              <div class="foto-mascota">
+                @if (mascota.foto) {
+                  <img
+                    [src]="mascota.foto"
+                    [alt]="'Foto de ' + mascota.nombre"
+                    (error)="ocultarFotoConError(mascota)"
+                  />
+                } @else {
+                  <ion-icon
+                    name="paw-outline"
+                    aria-hidden="true"
+                  ></ion-icon>
+                }
+              </div>
+
+              <div class="datos-mascota">
+                <h3>{{ mascota.nombre }}</h3>
+                <p>{{ mascota.raza || mascota.especie }}</p>
+              </div>
+            </a>
+          }
+
+          <a class="tarjeta-agregar" routerLink="/mascotas">
+            <ion-icon name="add-outline" aria-hidden="true"></ion-icon>
+            <span>Gestionar mascotas</span>
+          </a>
+        </div>
       }
     </section>
 
@@ -106,7 +195,6 @@
         <span class="etiqueta-pendiente">Próximamente</span>
       </div>
 
-      <!-- No presentamos solicitudes ficticias como si fueran reales. -->
       <div class="solicitudes-vacias">
         <span class="icono-solicitudes">
           <ion-icon name="heart-outline" aria-hidden="true"></ion-icon>
@@ -121,7 +209,6 @@
   </main>
 </ion-content>
 
-<!-- El footer queda fuera del contenido para no taparlo al desplazarse. -->
 <ion-footer class="ion-no-border">
   <nav class="menu-inferior" aria-label="Navegación principal">
     <a routerLink="/home" class="activo" aria-current="page">
@@ -144,7 +231,6 @@
       <span>Comunidad</span>
     </button>
 
-    <!-- Abre los datos de la cuenta y la opción de cerrar sesión. -->
     <a routerLink="/perfil">
       <ion-icon name="person-outline" aria-hidden="true"></ion-icon>
       <span>Perfil</span>
