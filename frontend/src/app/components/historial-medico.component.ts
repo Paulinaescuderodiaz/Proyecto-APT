@@ -8,6 +8,7 @@ import {
 import { DatePipe } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { AdjuntarDocumentoComponent } from './adjuntar-documento.component';
 
 import {
   RegistroMedico,
@@ -17,7 +18,7 @@ import {
 @Component({
   selector: 'app-historial-medico',
   standalone: true,
-  imports: [FormsModule, DatePipe],
+  imports: [FormsModule, DatePipe, AdjuntarDocumentoComponent],
   templateUrl: './historial-medico.component.html',
   styleUrls: ['./historial-medico.component.scss'],
 })
