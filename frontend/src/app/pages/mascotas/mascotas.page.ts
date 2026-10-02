@@ -4,7 +4,7 @@ import { IonContent } from '@ionic/angular';
 import { MascotaService } from '../../services/mascota.service';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HistorialMedicoComponent } from '../../components/historial-medico.component';
-
+import { VacunasComponent } from '../../components/vacunas.component';
 // Modelo de la vista: los valores null de la API se convierten en cadenas vacías al cargar.
 interface Mascota {
   id: number;
@@ -24,6 +24,7 @@ interface Mascota {
     FormsModule,
     RouterLink,
     HistorialMedicoComponent,
+    VacunasComponent,
   ],
 
 })
