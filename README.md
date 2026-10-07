@@ -226,6 +226,65 @@ Comprobación manual del flujo principal:
 | Error CORS | Confirmar que el proceso del puerto 3000 corresponde al backend actualizado y reiniciarlo |
 | No se puede cargar un documento | Comprobar que existe `backend/uploads`, el formato y el máximo de 5 MB |
 
+
+## Ejecutar el backend con Docker
+
+Requisitos: tener Docker Desktop instalado y abierto.
+
+1. Entrar a la carpeta del backend:
+
+```
+cd backend
+```
+
+2. Crear el archivo `.env` copiando el ejemplo y reemplazando los valores:
+
+```
+copy .env.example .env
+```
+
+3. Levantar la API y la base de datos:
+
+```
+docker compose up --build
+```
+
+La API queda disponible en `http://localhost:3000`. Las migraciones de Prisma se aplican solas al iniciar.
+
+4. Para apagar todo:
+
+```
+docker compose down
+```## Ejecutar el backend con Docker
+
+Requisitos: tener Docker Desktop instalado y abierto.
+
+1. Entrar a la carpeta del backend:
+
+```
+cd backend
+```
+
+2. Crear el archivo `.env` copiando el ejemplo y reemplazando los valores:
+
+```
+copy .env.example .env
+```
+
+3. Levantar la API y la base de datos:
+
+```
+docker compose up --build
+```
+
+La API queda disponible en `http://localhost:3000`. Las migraciones de Prisma se aplican solas al iniciar.
+
+4. Para apagar todo:
+
+```
+docker compose down
+```
+
 ## Documentación académica
 
 - [Informe del proyecto](Informe_APT_Pethub_Completo_final.pdf)
