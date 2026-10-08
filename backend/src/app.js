@@ -13,7 +13,7 @@ const vacunaRoutes = require("./routes/vacuna.routes"); // crear/listar/editar v
 const registroMedicoRoutes = require("./routes/registroMedico.routes"); // crear/listar diagnósticos y tratamientos
 const documentoRoutes = require("./routes/documento.routes"); // subir fotos/PDFs asociados a un registro médico
 const recordatorioRoutes = require("./routes/recordatorio.routes"); // revisión de vacunas próximas y recordatorios
-
+const donanteRoutes = require("./routes/donante.routes"); // registrar mascotas como donantes
 const app = express(); // crea la aplicación Express propiamente tal
 
 // --- Middlewares globales ---
@@ -52,7 +52,7 @@ app.use("/api/vacunas", vacunaRoutes);                       // ej: POST /api/va
 app.use("/api/registros-medicos", registroMedicoRoutes);    // ej: POST /api/registros-medicos
 app.use("/api/documentos", documentoRoutes);                 // ej: POST /api/documentos
 app.use("/api/recordatorios", recordatorioRoutes);           // ej: GET /api/recordatorios/pendientes
-
+app.use("/api/donantes", donanteRoutes);                     // ej: POST /api/donantes
 // Se exporta "app" (sin llamar a .listen() aquí) para que:
 // 1) index.js pueda importarla y hacerla escuchar en un puerto real, y
 // 2) los tests con Supertest puedan importarla directo, sin necesidad
