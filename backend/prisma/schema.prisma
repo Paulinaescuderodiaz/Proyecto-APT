@@ -40,6 +40,7 @@ model Mascota {
   createdAt       DateTime  @default(now())
   vacunas         Vacuna[]          // lado inverso: una mascota puede tener muchas vacunas
   registrosMedicos RegistroMedico[] // lado inverso: una mascota puede tener muchos registros médicos
+  donante Donante? // lado inverso: una mascota puede ser donante (el "?" = como máximo una vez)
 }
 
 // Representa cada vacuna aplicada (o por aplicar) a una mascota — S2-HU04
@@ -87,4 +88,14 @@ model Recordatorio {
   estado     String   // "enviado" (escenario 1) o "fallido" (escenario 2)
   fechaEnvio DateTime @default(now())
   visto      Boolean  @default(false) // si el usuario ya lo vio dentro de la app
+}
+
+// Mascota registrada como donante voluntario de sangre — S3-HU08
+model Donante {
+  id             Int      @id @default(autoincrement())
+  mascotaId      Int      @unique // @unique: una mascota solo puede registrarse una vez como donante
+  mascota        Mascota  @relation(fields: [mascotaId], references: [id])
+  grupoSanguineo String?  // opcional: puede quedar pendiente si aún no se conoce
+  estado         String   // "activo" (grupo conocido) o "pendiente" (grupo aún no conocido)
+  createdAt      DateTime @default(now())
 }
