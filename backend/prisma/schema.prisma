@@ -24,6 +24,7 @@ model Usuario {
   createdAt DateTime  @default(now()) // fecha en que se creó la cuenta, se llena sola
   mascotas  Mascota[] // lado inverso: un usuario puede tener muchas mascotas
   pushToken String? // token del dispositivo para notificaciones push (vacío hasta que el frontend lo implemente)
+  solicitudes SolicitudSangre[] // lado inverso: un usuario puede publicar varias solicitudes de sangre
 }
 
 // Representa a cada mascota registrada por un usuario
@@ -97,5 +98,17 @@ model Donante {
   mascota        Mascota  @relation(fields: [mascotaId], references: [id])
   grupoSanguineo String?  // opcional: puede quedar pendiente si aún no se conoce
   estado         String   // "activo" (grupo conocido) o "pendiente" (grupo aún no conocido)
+  createdAt      DateTime @default(now())
+}
+
+// Solicitud de sangre publicada por un usuario — S3-HU09
+model SolicitudSangre {
+  id             Int      @id @default(autoincrement())
+  usuarioId      Int      // quien publica la solicitud
+  usuario        Usuario  @relation(fields: [usuarioId], references: [id])
+  especie        String   // especie de la mascota que necesita sangre
+  grupoSanguineo String   // grupo sanguíneo requerido
+  urgencia       String   // "alta", "media" o "baja" (obligatoria: escenario 2 de HU09)
+  estado         String   @default("activa") // "activa" o "resuelta" (RF-13: se retira de las búsquedas)
   createdAt      DateTime @default(now())
 }
