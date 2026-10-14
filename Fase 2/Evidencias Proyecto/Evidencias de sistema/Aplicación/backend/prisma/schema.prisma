@@ -1,0 +1,101 @@
+// --- Configuración del generador ---
+// Le dice a Prisma que genere el "cliente" (el código JS que usamos como
+// prisma.usuario.create(), prisma.vacuna.findMany(), etc.) en node_modules
+generator client {
+  provider = "prisma-client-js"
+}
+
+// --- Configuración de la conexión a la base de datos ---
+// provider indica qué motor de base de datos usamos (PostgreSQL)
+// url la toma de la variable DATABASE_URL definida en el archivo .env
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Representa a cada persona que se registra en la app (dueño de mascota)
+model Usuario {
+  id        Int       @id @default(autoincrement()) // identificador único, autogenerado
+  nombre    String
+  email     String    @unique // @unique impide que dos usuarios tengan el mismo correo
+  password  String    // guarda el HASH de la contraseña, nunca el texto original
+  telefono  String?   // el "?" significa opcional
+  comuna    String?
+  createdAt DateTime  @default(now()) // fecha en que se creó la cuenta, se llena sola
+  mascotas  Mascota[] // lado inverso: un usuario puede tener muchas mascotas
+  pushToken String? // token del dispositivo para notificaciones push (vacío hasta que el frontend lo implemente)
+}
+
+// Representa a cada mascota registrada por un usuario
+model Mascota {
+  id              Int       @id @default(autoincrement())
+  nombre          String
+  especie         String
+  raza            String?
+  fechaNacimiento DateTime?
+  sexo            String?
+  foto            String?
+  usuarioId       Int       // guarda el id del usuario dueño de esta mascota
+  usuario         Usuario   @relation(fields: [usuarioId], references: [id]) // conecta con Usuario
+  createdAt       DateTime  @default(now())
+  vacunas         Vacuna[]          // lado inverso: una mascota puede tener muchas vacunas
+  registrosMedicos RegistroMedico[] // lado inverso: una mascota puede tener muchos registros médicos
+  donante Donante? // lado inverso: una mascota puede ser donante (el "?" = como máximo una vez)
+}
+
+// Representa cada vacuna aplicada (o por aplicar) a una mascota — S2-HU04
+model Vacuna {
+  id                    Int       @id @default(autoincrement())
+  nombre                String
+  fechaAplicacion       DateTime
+  fechaProximoRefuerzo  DateTime? // opcional: no todas las vacunas requieren refuerzo
+  aplicada              Boolean   @default(false) // empieza en falso; se usará en HU07 (recordatorios)
+  mascotaId             Int
+  mascota               Mascota   @relation(fields: [mascotaId], references: [id])
+  createdAt             DateTime  @default(now())
+  recordatorios Recordatorio[]
+}
+
+// Representa cada enfermedad/diagnóstico y su tratamiento — S2-HU05
+model RegistroMedico {
+  id           Int       @id @default(autoincrement())
+  diagnostico  String    // obligatorio: sin esto no se puede guardar (escenario 2 de HU05)
+  fecha        DateTime  // necesaria para poder ordenar el historial (escenario 3 de HU05)
+  tratamiento  String?   // opcional: la historia no exige que sea obligatorio
+  mascotaId    Int
+  mascota      Mascota   @relation(fields: [mascotaId], references: [id])
+  createdAt    DateTime  @default(now())
+  documentos Documento[]
+}
+
+// Representa cada archivo (foto o PDF) adjuntado a un registro médico — S2-HU06
+model Documento {
+  id               Int             @id @default(autoincrement())
+  nombreArchivo    String          // nombre original del archivo (ej: "radiografia.pdf")
+  rutaArchivo      String          // dónde quedó guardado el archivo en el servidor
+  tipoArchivo      String          // extensión o tipo (ej: "application/pdf", "image/png")
+  tamano           Int             // tamaño del archivo en bytes
+  registroMedicoId Int
+  registroMedico   RegistroMedico  @relation(fields: [registroMedicoId], references: [id])
+  createdAt        DateTime        @default(now())
+}
+
+// Registra cada intento de recordatorio de vacuna — S2-HU07
+model Recordatorio {
+  id         Int      @id @default(autoincrement())
+  vacunaId   Int
+  vacuna     Vacuna   @relation(fields: [vacunaId], references: [id])
+  estado     String   // "enviado" (escenario 1) o "fallido" (escenario 2)
+  fechaEnvio DateTime @default(now())
+  visto      Boolean  @default(false) // si el usuario ya lo vio dentro de la app
+}
+
+// Mascota registrada como donante voluntario de sangre — S3-HU08
+model Donante {
+  id             Int      @id @default(autoincrement())
+  mascotaId      Int      @unique // @unique: una mascota solo puede registrarse una vez como donante
+  mascota        Mascota  @relation(fields: [mascotaId], references: [id])
+  grupoSanguineo String?  // opcional: puede quedar pendiente si aún no se conoce
+  estado         String   // "activo" (grupo conocido) o "pendiente" (grupo aún no conocido)
+  createdAt      DateTime @default(now())
+}
