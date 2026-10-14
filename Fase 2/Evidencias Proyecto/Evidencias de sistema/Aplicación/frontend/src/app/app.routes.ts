@@ -1,5 +1,7 @@
 ﻿import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
+import { isDevMode } from '@angular/core';
+
 
 // Cada loadComponent carga una página bajo demanda. Estas rutas todavía no tienen guards de sesión.
 export const routes: Routes = [
@@ -8,6 +10,14 @@ export const routes: Routes = [
     path: 'home',
     canActivate: [authGuard],
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
+  },
+
+  {
+    path: 'demo-donante',
+    canMatch: [() => isDevMode()],
+    loadComponent: () =>
+      import('./components/donante.component')
+        .then(m => m.DonanteComponent),
   },
   {
     // La URL raíz abre la bienvenida; full evita redirigir las demás rutas.

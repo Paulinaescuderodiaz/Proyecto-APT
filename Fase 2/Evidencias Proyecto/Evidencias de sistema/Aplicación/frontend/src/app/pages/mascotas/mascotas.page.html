@@ -47,6 +47,8 @@
       </section>
       <!-- HU04: vacunas de la mascota seleccionada. -->
       <app-vacunas [mascotaId]="mascota.id"></app-vacunas>
+      <!-- HU08: demostración del registro como donante voluntario. -->
+      <app-donante [mascotaId]="mascota.id" [nombreMascota]="mascota.nombre"></app-donante>
 
       <!-- HU05: historial médico de la mascota seleccionada. -->
       <app-historial-medico [mascotaId]="mascota.id"></app-historial-medico>

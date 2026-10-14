@@ -5,6 +5,7 @@ import { MascotaService } from '../../services/mascota.service';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HistorialMedicoComponent } from '../../components/historial-medico.component';
 import { VacunasComponent } from '../../components/vacunas.component';
+import { DonanteComponent } from '../../components/donante.component';
 // Modelo de la vista: los valores null de la API se convierten en cadenas vacías al cargar.
 interface Mascota {
   id: number;
@@ -25,6 +26,7 @@ interface Mascota {
     RouterLink,
     HistorialMedicoComponent,
     VacunasComponent,
+    DonanteComponent,
   ],
 
 })
