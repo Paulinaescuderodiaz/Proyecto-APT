@@ -27,20 +27,33 @@ function nombreValido(
 }
 
 // Comprueba que sea una fecha real con formato AAAA-MM-DD.
+// Valida el calendario y limita los años permitidos para las vacunas.
 function fechaValida(
   control: AbstractControl
 ): ValidationErrors | null {
   const valor = control.value;
 
+  // El refuerzo es opcional. La aplicación usa Validators.required.
   if (!valor) return null;
 
-  if (typeof valor !== 'string' ||
-      !/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+  if (
+    typeof valor !== 'string' ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(valor)
+  ) {
+    return { fechaInvalida: true };
+  }
+
+  const anio = Number(valor.slice(0, 4));
+  const anioMinimo = 2000;
+  const anioMaximo = new Date().getFullYear() + 10;
+
+  if (anio < anioMinimo || anio > anioMaximo) {
     return { fechaInvalida: true };
   }
 
   const fecha = new Date(`${valor}T00:00:00.000Z`);
 
+  // La comparación también rechaza fechas como el 30 de febrero.
   return Number.isFinite(fecha.getTime()) &&
     fecha.toISOString().slice(0, 10) === valor
     ? null
