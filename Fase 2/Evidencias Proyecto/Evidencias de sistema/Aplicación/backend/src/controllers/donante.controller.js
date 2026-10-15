@@ -59,5 +59,55 @@ async function crearDonante(req, res) {
     res.status(500).json({ error: "Error al registrar al donante" });
   }
 }
+// S3-HU10: buscar donantes compatibles por especie y grupo sanguíneo.
+// Solo aparecen los donantes "activos". Si se indica la comuna, los de esa comuna salen primero.
+async function buscarDonantes(req, res) {
+  try {
+    const { especie, grupoSanguineo, comuna } = req.query; // vienen en la URL: ?especie=perro&grupoSanguineo=...
 
-module.exports = { crearDonante };
+    if (!especie || !grupoSanguineo) {
+      return res.status(400).json({ error: "Faltan datos: especie y grupo sanguíneo son obligatorios" });
+    }
+
+    const donantes = await prisma.donante.findMany({
+      where: {
+        estado: "activo", // los "pendientes" (sin grupo) no sirven para buscar
+        // mode: "insensitive" hace que "perro" y "Perro" cuenten como lo mismo
+        grupoSanguineo: { equals: String(grupoSanguineo).trim(), mode: "insensitive" },
+        mascota: { especie: { equals: String(especie).trim(), mode: "insensitive" } },
+      },
+      // Traemos la mascota y la comuna de su dueño (solo la comuna, nunca correo ni teléfono)
+      include: { mascota: { include: { usuario: { select: { comuna: true } } } } },
+    });
+
+    // Armamos la respuesta solo con los datos que la búsqueda necesita mostrar
+    const resultado = donantes.map((d) => ({
+      id: d.id,
+      mascota: d.mascota.nombre,
+      especie: d.mascota.especie,
+      raza: d.mascota.raza,
+      grupoSanguineo: d.grupoSanguineo,
+      comuna: d.mascota.usuario.comuna,
+    }));
+
+    // Si se indicó comuna, los de la misma comuna pasan adelante
+    if (comuna) {
+      const buscada = String(comuna).trim().toLowerCase();
+      const esMisma = (c) => (c || "").trim().toLowerCase() === buscada;
+      resultado.sort((a, b) => Number(esMisma(b.comuna)) - Number(esMisma(a.comuna)));
+    }
+
+    if (resultado.length === 0) {
+      return res.json({
+        mensaje: "No se encontraron donantes compatibles en este momento",
+        donantes: [],
+      });
+    }
+
+    res.json({ donantes: resultado });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al buscar donantes" });
+  }
+}
+module.exports = { crearDonante, buscarDonantes };
