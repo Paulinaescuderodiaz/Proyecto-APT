@@ -1,27 +1,31 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnDestroy,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { Donante, DonanteService } from '../services/donante.service';
 
 @Component({
-    selector: 'app-donante',
-    standalone: true,
-    imports: [FormsModule],
-    template: `
+  selector: 'app-donante',
+  standalone: true,
+  imports: [FormsModule],
+  template: `
     <section class="donante" aria-labelledby="titulo-donante">
-      <span class="etiqueta">Demostración · Sin conexión al servidor</span>
-
       <h2 id="titulo-donante">Donante voluntario</h2>
-    <p>
-        Inscribe a {{ nombreMascota || 'tu mascota de demostración' }}
-        en la red de donantes.
-    </p>
+
+      <p>Inscribe a {{ nombreMascota || 'tu mascota' }} en la red de donantes.</p>
 
       @if (registro; as datos) {
         <div class="resultado" role="status">
-          <h3>Inscripción simulada</h3>
+          <h3>Inscripción registrada</h3>
           <p>
-  <strong>Mascota:</strong>
-  {{ nombreMascota || 'Mascota de demostración' }}
-</p>
+            <strong>Mascota:</strong>
+            {{ nombreMascota || 'Tu mascota' }}
+          </p>
           <p>
             <strong>Grupo sanguíneo:</strong>
             {{ datos.grupoSanguineo || 'Desconocido' }}
@@ -30,56 +34,68 @@ import { FormsModule, NgForm } from '@angular/forms';
             <strong>Estado:</strong>
             {{ datos.estado === 'activo' ? 'Activo' : 'Pendiente de tipificación' }}
           </p>
-          <p>Estos datos no se han enviado al servidor.</p>
+          <p>La inscripción se guardó correctamente.</p>
         </div>
       } @else {
-        <form #formulario="ngForm" (ngSubmit)="inscribir(formulario)" novalidate>
-          <label class="opcion">
-            <input
-              type="checkbox"
-              name="conoceGrupo"
-              [(ngModel)]="conoceGrupo"
-              (ngModelChange)="cambiarConocimiento()"
-            />
-            Conozco su grupo sanguíneo
-          </label>
+        <form
+          #formulario="ngForm"
+          (ngSubmit)="inscribir(formulario)"
+          novalidate
+        >
+          <fieldset [disabled]="guardando">
+            <legend>Datos de inscripción</legend>
 
-          @if (conoceGrupo) {
-            <label for="grupo-donante">Grupo sanguíneo</label>
-            <input
-              id="grupo-donante"
-              class="campo"
-              name="grupoSanguineo"
-              [(ngModel)]="grupoSanguineo"
-              required
-              maxlength="40"
-              aria-describedby="ayuda-grupo"
-            />
-            <p id="ayuda-grupo">
-              Escríbelo tal como aparece en su examen veterinario.
-            </p>
-          } @else {
-            <p>
-              Si desconoces su grupo, la inscripción quedará pendiente
-              de tipificación.
-            </p>
-          }
+            <label class="opcion">
+              <input
+                type="checkbox"
+                name="conoceGrupo"
+                [(ngModel)]="conoceGrupo"
+                (ngModelChange)="cambiarConocimiento()"
+              />
+              Conozco su grupo sanguíneo
+            </label>
 
-          <label class="opcion">
-            <input
-              type="checkbox"
-              name="acepta"
-              [(ngModel)]="acepta"
-              required
-            />
-            Quiero inscribir voluntariamente a mi mascota.
-          </label>
+            @if (conoceGrupo) {
+              <label for="grupo-donante">Grupo sanguíneo</label>
+              <input
+                id="grupo-donante"
+                class="campo"
+                name="grupoSanguineo"
+                [(ngModel)]="grupoSanguineo"
+                required
+                maxlength="40"
+                aria-describedby="ayuda-grupo"
+              />
+              <p id="ayuda-grupo">
+                Escríbelo tal como aparece en su examen veterinario.
+              </p>
+            } @else {
+              <p>
+                Si desconoces su grupo, la inscripción quedará pendiente
+                de tipificación.
+              </p>
+            }
+
+            <label class="opcion">
+              <input
+                type="checkbox"
+                name="acepta"
+                [(ngModel)]="acepta"
+                required
+              />
+              Quiero inscribir voluntariamente a mi mascota y declaro
+              que cumple los requisitos para donar, sujetos a evaluación
+              veterinaria.
+            </label>
+
+            <button type="submit">
+              {{ guardando ? 'Inscribiendo…' : 'Inscribir como donante' }}
+            </button>
+          </fieldset>
 
           @if (error) {
             <p class="error" role="alert">{{ error }}</p>
           }
-
-          <button type="submit">Simular inscripción</button>
         </form>
       }
 
@@ -89,7 +105,7 @@ import { FormsModule, NgForm } from '@angular/forms';
       </p>
     </section>
   `,
-    styles: [`
+  styles: [`
     :host {
       display: block;
       margin: 24px 0;
@@ -103,18 +119,20 @@ import { FormsModule, NgForm } from '@angular/forms';
       color: #243c38;
     }
 
-    .etiqueta {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 8px;
-      background: #fff2cf;
-      color: #695016;
-      font-size: 13px;
+    h2 { margin-bottom: 8px; }
+    p { line-height: 1.5; }
+
+    fieldset {
+      min-width: 0;
+      margin: 0;
+      padding: 0;
+      border: 0;
     }
 
-    h2 { margin-bottom: 8px; }
-
-    p { line-height: 1.5; }
+    legend {
+      margin-top: 16px;
+      font-weight: 600;
+    }
 
     .opcion {
       display: flex;
@@ -149,7 +167,13 @@ import { FormsModule, NgForm } from '@angular/forms';
       cursor: pointer;
     }
 
-    button:focus-visible, input:focus-visible {
+    fieldset:disabled button {
+      opacity: 0.65;
+      cursor: wait;
+    }
+
+    button:focus-visible,
+    input:focus-visible {
       outline: 3px solid #a96b00;
       outline-offset: 3px;
     }
@@ -170,64 +194,105 @@ import { FormsModule, NgForm } from '@angular/forms';
     }
   `],
 })
-export class DonanteComponent implements OnChanges {
-    // Los valores predeterminados permiten abrir la demostración sin una API.
-    @Input() mascotaId = 0;
-    @Input() nombreMascota = 'Mascota de demostración';
+export class DonanteComponent implements OnChanges, OnDestroy {
+  @Input() mascotaId = 0;
+  @Input() nombreMascota = '';
 
-    conoceGrupo = false;
-    grupoSanguineo = '';
-    acepta = false;
-    error = '';
+  conoceGrupo = false;
+  grupoSanguineo = '';
+  acepta = false;
+  error = '';
+  guardando = false;
 
-    registro: {
-        grupoSanguineo: string | null;
-        estado: 'activo' | 'pendiente';
-    } | null = null;
+  registro: Donante | null = null;
+  private consulta?: Subscription;
 
-    // Reinicia la demostración si se selecciona otra mascota.
-    ngOnChanges(): void {
-        this.conoceGrupo = false;
-        this.grupoSanguineo = '';
-        this.acepta = false;
-        this.error = '';
-        this.registro = null;
+  constructor(
+    private donanteService: DonanteService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  // Limpia la vista si se selecciona otra mascota.
+  ngOnChanges(): void {
+    this.consulta?.unsubscribe();
+    this.conoceGrupo = false;
+    this.grupoSanguineo = '';
+    this.acepta = false;
+    this.error = '';
+    this.guardando = false;
+    this.registro = null;
+  }
+
+  cambiarConocimiento(): void {
+    this.grupoSanguineo = '';
+    this.error = '';
+  }
+
+  inscribir(formulario: NgForm): void {
+    // Evita solicitudes repetidas mientras esperamos al servidor.
+    if (this.guardando || this.registro) return;
+
+    this.error = '';
+    const grupo = this.grupoSanguineo.trim();
+
+    if (!Number.isInteger(this.mascotaId) || this.mascotaId <= 0) {
+      this.error = 'Abre la ficha de una mascota para inscribirla.';
+      return;
     }
 
-    cambiarConocimiento(): void {
-        this.grupoSanguineo = '';
-        this.error = '';
+    if (this.conoceGrupo && (!grupo || grupo.length > 40)) {
+      this.error =
+        'Ingresa un grupo sanguíneo válido de hasta 40 caracteres.';
+      formulario.control.markAllAsTouched();
+      return;
     }
 
-    inscribir(formulario: NgForm): void {
-        // Evita repetir una inscripción dentro de esta demostración.
-        if (this.registro) return;
-
-        this.error = '';
-        const grupo = this.grupoSanguineo.trim();
-
-        if (this.conoceGrupo && (!grupo || grupo.length > 40)) {
-            this.error = 'Ingresa un grupo sanguíneo válido de hasta 40 caracteres.';
-            formulario.control.markAllAsTouched();
-            return;
-        }
-
-        if (!this.acepta) {
-            this.error = 'Confirma que quieres inscribir voluntariamente a tu mascota.';
-            formulario.control.markAllAsTouched();
-            return;
-        }
-
-        if (formulario.invalid) {
-            formulario.control.markAllAsTouched();
-            this.error = 'Revisa los campos del formulario.';
-            return;
-        }
-
-        // Simulación local: no crea registros reales ni realiza solicitudes HTTP.
-        this.registro = {
-            grupoSanguineo: this.conoceGrupo ? grupo : null,
-            estado: this.conoceGrupo ? 'activo' : 'pendiente',
-        };
+    if (!this.acepta) {
+      this.error =
+        'Confirma la inscripción y la declaración de requisitos.';
+      formulario.control.markAllAsTouched();
+      return;
     }
+
+    if (formulario.invalid) {
+      formulario.control.markAllAsTouched();
+      this.error = 'Revisa los campos del formulario.';
+      return;
+    }
+
+    this.guardando = true;
+
+    this.consulta = this.donanteService.registrar({
+      mascotaId: this.mascotaId,
+      grupoSanguineo: this.conoceGrupo ? grupo : null,
+      cumpleRequisitos: this.acepta,
+    }).subscribe({
+      next: (donante) => {
+        // Usa la respuesta real para mostrar la inscripción confirmada.
+        this.registro = donante;
+        this.guardando = false;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        this.guardando = false;
+
+        if (error.status === 401) {
+          this.error = 'Tu sesión no es válida. Vuelve a iniciar sesión.';
+        } else if (error.status === 409) {
+          this.error = 'Esta mascota ya está registrada como donante.';
+        } else if (error.status === 404) {
+          this.error = 'No encontramos esta mascota en tu cuenta.';
+        } else {
+          this.error =
+            'No pudimos registrar la inscripción. Conservamos tus datos para reintentar.';
+        }
+
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.consulta?.unsubscribe();
+  }
 }

@@ -50,5 +50,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/perfil/perfil.page').then((m) => m.PerfilPage),
   },
+
+  {
+    path: 'solicitudes-sangre',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./components/solicitudes-sangre.component')
+        .then(m => m.SolicitudesSangreComponent),
+  },
 ];
 
