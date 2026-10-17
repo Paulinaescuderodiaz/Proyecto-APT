@@ -58,5 +58,13 @@ export const routes: Routes = [
       import('./components/solicitudes-sangre.component')
         .then(m => m.SolicitudesSangreComponent),
   },
+
+  {
+    path: 'buscar-donantes',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./components/buscar-donantes.component')
+        .then(m => m.BuscarDonantesComponent),
+  },
 ];
 

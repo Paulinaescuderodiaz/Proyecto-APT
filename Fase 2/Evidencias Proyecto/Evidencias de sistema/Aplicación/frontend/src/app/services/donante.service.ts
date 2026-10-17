@@ -16,6 +16,20 @@ export interface CrearDonante {
   cumpleRequisitos: boolean;
 }
 
+export interface DonanteEncontrado {
+  id: number;
+  mascota: string;
+  especie: string;
+  raza: string | null;
+  grupoSanguineo: string;
+  comuna: string | null;
+}
+
+export interface ResultadoBusquedaDonantes {
+  donantes: DonanteEncontrado[];
+  mensaje?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -35,4 +49,24 @@ export class DonanteService {
     // El backend verifica que la mascota pertenezca al usuario.
     return this.http.post<Donante>(this.url, datos, { headers });
   }
+
+  buscar(especie: string, grupoSanguineo: string, comuna = '') {
+  const token = localStorage.getItem('pethub_token');
+
+  const headers = new HttpHeaders(
+    token ? { Authorization: `Bearer ${token}` } : {}
+  );
+
+  // Angular codifica los parámetros para conservar espacios y signos.
+  const params = {
+    especie: especie.trim(),
+    grupoSanguineo: grupoSanguineo.trim(),
+    comuna: comuna.trim(),
+  };
+
+  return this.http.get<ResultadoBusquedaDonantes>(
+    `${this.url}/buscar`,
+    { headers, params }
+  );
+}
 }
