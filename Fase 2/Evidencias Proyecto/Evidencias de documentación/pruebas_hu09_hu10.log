@@ -1,0 +1,21 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> frontend@0.0.1 test
+> ng test --watch=false
+
+❯ Building...
+One or more browsers which are configured in the project's Browserslist configuration fall outside Angular's browser support for this version.
+Unsupported browsers:
+chrome 110, chrome 109, chrome 108, chrome 107, edge 110, edge 109, edge 108, edge 107, firefox 111, firefox 110, firefox 109, firefox 108, firefox 107, firefox 106, ios_saf 16.3, ios_saf 16.2, ios_saf 16.1, safari 16.3, safari 16.2, safari 16.1
+✔ Building...
+Application bundle generation complete. [2.764 seconds] - 2026-10-18T17:06:18.214Z
+
+
+ RUN  v4.1.11 /workspace/scratch/593d4faac936/pethub_entrega/Fase 2/Evidencias Proyecto/Evidencias de sistema/Aplicación/frontend
+
+
+ Test Files  14 passed (14)
+      Tests  66 passed (66)
+   Start at  12:06:18
+   Duration  3.37s (transform 6.63s, setup 2.18s, import 13.19s, tests 2.03s, environment 5.65s)
+
