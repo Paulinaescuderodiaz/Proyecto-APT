@@ -25,6 +25,7 @@ model Usuario {
   mascotas  Mascota[] // lado inverso: un usuario puede tener muchas mascotas
   pushToken String? // token del dispositivo para notificaciones push (vacío hasta que el frontend lo implemente)
   solicitudes SolicitudSangre[] // lado inverso: un usuario puede publicar varias solicitudes de sangre
+  notificaciones Notificacion[] // lado inverso: un usuario puede recibir muchas notificaciones
 }
 
 // Representa a cada mascota registrada por un usuario
@@ -111,4 +112,19 @@ model SolicitudSangre {
   urgencia       String   // "alta", "media" o "baja" (obligatoria: escenario 2 de HU09)
   estado         String   @default("activa") // "activa" o "resuelta" (RF-13: se retira de las búsquedas)
   createdAt      DateTime @default(now())
+  notificaciones Notificacion[] // lado inverso: una solicitud puede generar varias notificaciones
+}
+
+// Aviso que el sistema le crea a un usuario dentro de la plataforma — S4-HU11
+// (en la versión web reemplaza a la notificación push del plan original)
+model Notificacion {
+  id          Int             @id @default(autoincrement())
+  usuarioId   Int             // quién recibe el aviso (dueño del donante compatible)
+  usuario     Usuario         @relation(fields: [usuarioId], references: [id])
+  tipo        String          // por ahora solo "solicitud_compatible"
+  mensaje     String          // texto que verá la persona
+  solicitudId Int?            // solicitud que originó el aviso (opcional por si hay otros tipos más adelante)
+  solicitud   SolicitudSangre? @relation(fields: [solicitudId], references: [id])
+  leida       Boolean         @default(false) // empieza sin leer; el usuario la marcará como leída
+  createdAt   DateTime        @default(now())
 }
