@@ -35,7 +35,46 @@ async function crearSolicitud(req, res) {
       },
     });
 
-    res.status(201).json(solicitud);
+        // S4-HU11: avisar a los dueños de donantes compatibles con esta solicitud.
+    // Va en su propio try/catch: si falla un aviso, la solicitud igual queda publicada.
+    let notificados = 0;
+    try {
+      // Buscamos donantes ACTIVOS con el mismo grupo sanguíneo (sin distinguir mayúsculas)
+      // cuya mascota sea de la misma especie y NO sea del usuario que publicó la solicitud
+      const donantes = await prisma.donante.findMany({
+        where: {
+          estado: "activo",
+          grupoSanguineo: { equals: solicitud.grupoSanguineo, mode: "insensitive" },
+          mascota: {
+            especie: { equals: solicitud.especie, mode: "insensitive" },
+            usuarioId: { not: usuarioId },
+          },
+        },
+        include: { mascota: true }, // necesitamos la mascota para saber quién es el dueño
+      });
+
+      // Un dueño puede tener varios donantes compatibles: le mandamos un solo aviso.
+      // new Set elimina los ids repetidos.
+      const duenos = [...new Set(donantes.map((d) => d.mascota.usuarioId))];
+
+      if (duenos.length > 0) {
+        await prisma.notificacion.createMany({
+          data: duenos.map((id) => ({
+            usuarioId: id,
+            tipo: "solicitud_compatible",
+            // El mensaje no incluye datos de contacto de quien publica (privacidad)
+            mensaje: `Hay una solicitud de sangre de urgencia ${solicitud.urgencia} para ${solicitud.especie} con grupo ${solicitud.grupoSanguineo}. Tu mascota podría ayudar.`,
+            solicitudId: solicitud.id,
+          })),
+        });
+      }
+      notificados = duenos.length;
+    } catch (errorAviso) {
+      console.error("No se pudieron crear las notificaciones", errorAviso);
+    }
+
+    // Devolvemos la solicitud y, además, a cuántas personas se avisó
+    res.status(201).json({ ...solicitud, notificados });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error al publicar la solicitud" });
