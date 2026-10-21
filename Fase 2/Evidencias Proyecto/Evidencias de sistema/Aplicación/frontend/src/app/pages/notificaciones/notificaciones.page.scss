@@ -1,0 +1,28 @@
+:host { color: #243c38; }
+ion-content { --background: #faf8f5; }
+.pagina { max-width: 680px; margin: auto; padding: 24px 20px 40px; }
+h1 { margin: 24px 0 8px; font-size: 28px; }
+h1, h2 { color: #243c38; }
+p { line-height: 1.6; }
+a { color: #236b5d; }
+button { min-height: 44px; padding: 10px 16px; border: 1px solid #236b5d;
+  border-radius: 10px; background: white; color: #236b5d; font: inherit; cursor: pointer; }
+button:disabled { opacity: .6; cursor: default; }
+button:focus-visible, a:focus-visible { outline: 3px solid #a96b00; outline-offset: 3px; }
+.acciones, .filtros { display: flex; flex-wrap: wrap; gap: 8px; }
+.acciones { justify-content: space-between; margin: 24px 0 16px; }
+[aria-pressed='true'], .marcar { background: #236b5d; color: white; }
+.notificacion { margin: 16px 0; padding: 20px; border: 1px solid #dce7e5;
+  border-radius: 16px; background: white; }
+.no-leida { border-left: 4px solid #236b5d; background: #f0f7f5; }
+h2 { font-size: 18px; margin: 0 0 12px; }
+.etiqueta { padding: 4px 8px; border-radius: 6px; background: #e3eeeb; font-size: 13px; }
+.mensaje { overflow-wrap: anywhere; white-space: pre-line; }
+time { display: block; color: #526660; font-size: 14px; }
+.marcar { margin-top: 16px; }
+.estado, .error { padding: 16px; border-radius: 12px; background: #edf3f2; }
+.error { background: #fff0eb; color: #9e3427; }
+.error a { display: inline-block; padding: 12px; }
+.confirmacion { color: #236b5d; }
+.confirmacion:empty { display: none; }
+.nota, .resumen { color: #526660; font-size: 14px; }

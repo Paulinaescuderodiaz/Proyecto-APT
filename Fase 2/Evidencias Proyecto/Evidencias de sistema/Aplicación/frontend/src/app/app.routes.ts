@@ -3,7 +3,7 @@ import { authGuard } from './guards/auth.guard';
 import { isDevMode } from '@angular/core';
 
 
-// Cada loadComponent carga una página bajo demanda. Estas rutas todavía no tienen guards de sesión.
+// Cada loadComponent carga una página bajo demanda; authGuard protege las pantallas de la cuenta.
 export const routes: Routes = [
   {
     // Plantilla inicial de Ionic; el login exitoso lleva a /mascotas.
@@ -65,6 +65,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./components/buscar-donantes.component')
         .then(m => m.BuscarDonantesComponent),
+  },
+
+  {
+    path: 'notificaciones',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/notificaciones/notificaciones.page')
+        .then(m => m.NotificacionesPage),
   },
 ];
 

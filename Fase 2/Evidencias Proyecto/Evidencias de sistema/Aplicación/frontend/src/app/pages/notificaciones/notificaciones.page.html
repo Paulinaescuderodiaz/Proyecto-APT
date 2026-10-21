@@ -1,0 +1,58 @@
+<ion-content>
+  <main class="pagina">
+    <a routerLink="/home">← Inicio</a>
+    <h1>Notificaciones</h1>
+    <p>Avisos de solicitudes de sangre que coinciden con tus donantes registrados.</p>
+
+    <div class="acciones">
+      <div class="filtros" role="group" aria-label="Filtrar notificaciones">
+        <button type="button" [attr.aria-pressed]="!soloNoLeidas"
+          (click)="filtrar(false)">Todas</button>
+        <button type="button" [attr.aria-pressed]="soloNoLeidas"
+          (click)="filtrar(true)">No leídas</button>
+      </div>
+      <button type="button" class="actualizar" [disabled]="cargando || guardando.size > 0"
+        (click)="cargar()">Actualizar</button>
+    </div>
+
+    @if (cargando) {
+      <p class="estado" role="status">Cargando notificaciones…</p>
+    } @else if (errorCarga) {
+      <div class="error" role="alert">
+        <p>{{ errorCarga }}</p>
+        <button type="button" (click)="cargar()">Reintentar</button>
+        <a routerLink="/login">Ir al inicio de sesión</a>
+      </div>
+    } @else {
+      <p class="resumen">Notificaciones no leídas: {{ noLeidas }}</p>
+      @if (errorMarcado) {
+        <div class="error" role="alert">
+          <p>{{ errorMarcado }}</p>
+          <a routerLink="/login">Ir al inicio de sesión</a>
+        </div>
+      }
+      <p class="confirmacion" role="status">{{ mensaje }}</p>
+      <section aria-label="Lista de notificaciones">
+        @for (aviso of visibles; track aviso.id) {
+          <article class="notificacion" [class.no-leida]="!aviso.leida">
+            <h2>{{ aviso.tipo === 'solicitud_compatible' ? 'Solicitud de sangre compatible' : 'Aviso' }}</h2>
+            <span class="etiqueta">{{ aviso.leida ? 'Leída' : 'No leída' }}</span>
+            <p class="mensaje">{{ aviso.mensaje }}</p>
+            <time [attr.datetime]="aviso.createdAt">{{ aviso.createdAt | date:'dd/MM/yyyy HH:mm' }}</time>
+            @if (!aviso.leida) {
+              <button type="button" class="marcar" [disabled]="guardando.has(aviso.id)"
+                (click)="marcarLeida(aviso)">
+                {{ guardando.has(aviso.id) ? 'Guardando…' : 'Marcar como leída' }}
+              </button>
+            }
+          </article>
+        } @empty {
+          <p class="estado">{{ soloNoLeidas ? 'No tienes notificaciones sin leer.' : 'No tienes notificaciones todavía.' }}</p>
+        }
+      </section>
+    }
+
+    <p class="nota">La coincidencia de especie y grupo sanguíneo no confirma la aptitud
+      para donar. La evaluación corresponde al equipo veterinario.</p>
+  </main>
+</ion-content>

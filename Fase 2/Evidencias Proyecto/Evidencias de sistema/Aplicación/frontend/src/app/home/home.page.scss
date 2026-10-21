@@ -80,7 +80,8 @@ button:focus-visible {
   gap: 2px;
 }
 
-.acciones-cabecera button {
+.acciones-cabecera button,
+.acciones-cabecera a {
   display: grid;
   place-items: center;
   width: 44px;

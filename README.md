@@ -62,9 +62,10 @@ Abre **http://localhost:4200**. El frontend consulta la API en `http://localhost
 | `/mascotas` | Mascotas, carnet sanitario e inscripción como donante |
 | `/solicitudes-sangre` | Publicación y gestión de solicitudes propias |
 | `/buscar-donantes` | Búsqueda de donantes |
+| `/notificaciones` | Avisos de solicitudes coincidentes y marcado como leídos |
 | `/perfil` | Datos de la cuenta y cierre de sesión |
 
-Algunos accesos de Inicio todavía muestran “Próximamente”; puedes entrar directamente a las rutas anteriores después de autenticarte.
+Inicio ofrece accesos a solicitudes, inscripción y búsqueda de donantes. La campana abre las notificaciones, donde puedes consultar todos los avisos, filtrar los no leídos y marcarlos como leídos. Los mensajes y la comunidad todavía muestran “Próximamente”.
 
 ### Pruebas y apagado
 
