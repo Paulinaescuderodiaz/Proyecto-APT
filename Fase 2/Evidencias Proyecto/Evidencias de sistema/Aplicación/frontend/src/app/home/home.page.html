@@ -103,23 +103,23 @@
     </section>
 
     <section class="acciones-principales" aria-label="Donaciones">
-      <button type="button" class="accion solicitar" disabled>
+      <a class="accion solicitar" routerLink="/solicitudes-sangre">
         <span class="icono-accion">
           <ion-icon name="water-outline" aria-hidden="true"></ion-icon>
         </span>
         <span class="accion-etiqueta">Solicitar</span>
         <strong>Necesito un donante</strong>
-        <span class="proximamente">Próximamente</span>
-      </button>
+        <span class="ayuda-accion">Publicar y gestionar solicitudes</span>
+      </a>
 
-      <button type="button" class="accion donar" disabled>
+      <a class="accion donar" routerLink="/mascotas">
         <span class="icono-accion">
           <ion-icon name="heart-outline" aria-hidden="true"></ion-icon>
         </span>
         <span class="accion-etiqueta">Inscribir</span>
         <strong>Mi mascota donante</strong>
-        <span class="proximamente">Próximamente</span>
-      </button>
+        <span class="ayuda-accion">Selecciona una mascota y abre su ficha</span>
+      </a>
     </section>
 
     <section class="seccion" aria-labelledby="titulo-mascotas">
@@ -191,19 +191,22 @@
 
     <section class="seccion" aria-labelledby="titulo-solicitudes">
       <div class="titulo-seccion">
-        <h2 id="titulo-solicitudes">Solicitudes activas</h2>
-        <span class="etiqueta-pendiente">Próximamente</span>
+        <h2 id="titulo-solicitudes">Red de donantes</h2>
+        <a routerLink="/solicitudes-sangre">Mis solicitudes</a>
       </div>
 
       <div class="solicitudes-vacias">
         <span class="icono-solicitudes">
           <ion-icon name="heart-outline" aria-hidden="true"></ion-icon>
         </span>
-        <h3>Una comunidad para ayudar</h3>
+        <h3>Encuentra un posible donante</h3>
         <p>
-          Pronto podrás consultar solicitudes de donación y encontrar
-          mascotas que necesitan apoyo.
+          Busca por especie y grupo sanguíneo. Puedes indicar una comuna
+          para ver primero los donantes de esa zona.
         </p>
+        <a class="buscar-donantes" routerLink="/buscar-donantes">
+          Buscar donantes
+        </a>
       </div>
     </section>
   </main>
@@ -221,10 +224,10 @@
       <span>Mascotas</span>
     </a>
 
-    <button type="button" disabled aria-label="Donaciones, próximamente">
+    <a routerLink="/buscar-donantes">
       <ion-icon name="water-outline" aria-hidden="true"></ion-icon>
-      <span>Donaciones</span>
-    </button>
+      <span>Donantes</span>
+    </a>
 
     <button type="button" disabled aria-label="Comunidad, próximamente">
       <ion-icon name="people-outline" aria-hidden="true"></ion-icon>

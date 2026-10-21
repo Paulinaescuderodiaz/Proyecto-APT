@@ -171,7 +171,7 @@ h1 {
   line-height: 1.4;
 }
 
-.proximamente {
+.ayuda-accion {
   margin-top: 10px;
   font-size: 11px;
 }
@@ -314,7 +314,7 @@ h2 {
   cursor: pointer;
 }
 
-/* Estado informativo mientras se implementa el módulo de solicitudes. */
+/* Acceso a los módulos disponibles de la red de donantes. */
 .solicitudes-vacias {
   padding: 25px 20px;
   border: 1px solid #e6dfd8;
@@ -345,6 +345,20 @@ h2 {
   font-size: 13px;
   line-height: 1.6;
   color: var(--secundario);
+}
+
+.buscar-donantes {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin-top: 16px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  background: var(--verde);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 /* Barra inferior con espacio para la zona segura de los celulares. */
