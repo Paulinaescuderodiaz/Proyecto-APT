@@ -1,7 +1,8 @@
-# Evidencias grupales — Fase 1
+# Evidencias grupales de Fase 1
 
-Pendientes de incorporar en esta carpeta:
+- [Presentación oficial de Pethub](Pethub_Presentacion_Editable.pptx).
+- [Guía 1.5 de definición del proyecto](1.5_GuiaEstudiante_Fase%201_Definicion%20Proyecto%20APT.docx).
 
-- Presentación Proyecto.pptx
-- 1.4_APT122_FormativaFase1.docx
-- 1.5_GuiaEstudiante_Fase 1_Definicion Proyecto APT (Español).docx
+## Evaluación formativa 1.4
+
+Pendiente de incorporar la pauta evaluada por el docente, si ya fue entregada. No debe confundirse la plantilla vacía con una evaluación realizada.
