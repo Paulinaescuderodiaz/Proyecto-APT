@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#2f5d8c"/></marker></defs>
+<rect width="960" height="640" fill="#fafcff"/><g font-family="Arial,sans-serif" fill="#24384b" text-anchor="middle">
+<text x="480" y="42" font-size="26" font-weight="bold">Arquitectura de Pethub</text>
+<rect x="270" y="70" width="420" height="90" rx="12" fill="#e8f0f8" stroke="#2f5d8c"/>
+<text x="480" y="105" font-size="21" font-weight="bold">Navegador del usuario</text><text x="480" y="133" font-size="18">Frontend Angular e Ionic · puerto 4200</text>
+<path d="M480 160 V225" fill="none" stroke="#2f5d8c" stroke-width="2" marker-end="url(#arrow)"/><text x="655" y="198" font-size="16">HTTP REST · JSON · token JWT</text>
+<rect x="190" y="225" width="580" height="355" rx="16" fill="none" stroke="#8c9aa7" stroke-dasharray="6 5"/><text x="480" y="251" font-size="16">Docker Compose · entorno local</text>
+<rect x="270" y="270" width="420" height="100" rx="12" fill="#e8f0f8" stroke="#2f5d8c"/>
+<text x="480" y="300" font-size="21" font-weight="bold">API Node.js y Express · puerto 3000</text><text x="480" y="328" font-size="17">Autenticación · validación · reglas de negocio</text><text x="480" y="353" font-size="17">Prisma ORM para acceder a la base de datos</text>
+<path d="M385 370 V418 H330 V455" fill="none" stroke="#2f5d8c" stroke-width="2" marker-end="url(#arrow)"/><path d="M575 370 V418 H630 V455" fill="none" stroke="#2f5d8c" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="290" y="408" font-size="16">Consultas SQL</text><text x="675" y="408" font-size="16">Archivos adjuntos</text>
+<rect x="220" y="455" width="250" height="95" rx="12" fill="#edf5ef" stroke="#48795b"/><text x="345" y="489" font-size="21" font-weight="bold">PostgreSQL 16</text><text x="345" y="516" font-size="16">Red interna · volumen pgdata</text>
+<rect x="490" y="455" width="250" height="95" rx="12" fill="#fff5e5" stroke="#a77931"/><text x="615" y="489" font-size="21" font-weight="bold">Almacenamiento</text><text x="615" y="516" font-size="16">uploads → /app/uploads</text>
+<text x="480" y="614" font-size="16">El frontend se inicia por separado. PostgreSQL no publica un puerto al host.</text></g></svg>

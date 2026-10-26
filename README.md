@@ -10,13 +10,15 @@ Es un proyecto académico en desarrollo. La búsqueda relaciona datos registrado
 
 ## 2. Tecnologías utilizadas
 
-- **Lenguajes:** TypeScript, JavaScript, HTML, SCSS y SQL.
-- **Frameworks:** Angular 22 e Ionic 9 en el frontend; Node.js y Express 5 en el backend.
-- **Base de datos:** PostgreSQL y Prisma ORM 5.22, con migraciones versionadas.
+- **Lenguajes:** TypeScript 6.0, JavaScript, HTML, SCSS y SQL.
+- **Frameworks:** Angular 22.0.1 e Ionic 9 en el frontend; Node.js 20 en Docker y Express 5.2.1 en el backend.
+- **Base de datos:** PostgreSQL 16 y Prisma ORM 5.22, con migraciones versionadas.
 - **Cloud / Infraestructura:** Docker y Docker Compose para la API y PostgreSQL localmente. No se documenta un despliegue productivo en la nube.
 - **Autenticación:** JWT y bcryptjs.
-- **Pruebas:** Vitest y HttpTestingController en frontend; Jest y Supertest en backend.
+- **Pruebas:** Vitest 4 y HttpTestingController en frontend; Jest 29.7 y Supertest 7 en backend.
 - **Control de versiones:** Git y GitHub.
+
+Las versiones corresponden a las declaradas en los archivos `package.json`, `Dockerfile` y `docker-compose.yml`; `package-lock.json` fija las dependencias instaladas. El backend en Docker utiliza Node.js 20; el frontend requiere una versión de Node.js compatible con Angular 22, indicada a continuación.
 
 ## 3. Instrucciones para ejecutar el proyecto localmente
 
@@ -100,9 +102,22 @@ El equipo utiliza **Scrum adaptado a dos integrantes**, con sprints de dos seman
 
 Se realizan planificación del sprint, reuniones de seguimiento, revisión del incremento y retrospectiva. Los registros Scrum, la Carta Gantt y las evidencias de pruebas se mantienen en los documentos del proyecto. GitHub permite versionar el código y revisar los cambios; las funcionalidades se desarrollan en ramas y se integran a `main` tras su revisión y verificación.
 
+Elegimos Scrum porque permite entregar y revisar funcionalidades de forma gradual, recibir retroalimentación y ajustar las prioridades al tiempo disponible. En un equipo de dos integrantes, los sprints ayudan a coordinar el frontend y el backend y a detectar dificultades de integración antes del cierre.
+
+Los documentos de seguimiento están en el repositorio:
+
+- [Historias de usuario, criterios de aceptación y Definition of Done](Fase%202/Evidencias%20Proyecto/Evidencias%20de%20documentaci%C3%B3n/Pethub_Historias_Usuario_3.xlsx).
+- [Planificación, seguimiento y retrospectiva del Sprint 1](Fase%202/Evidencias%20Proyecto/Evidencias%20de%20documentaci%C3%B3n/Pethub_Plantillas_Sprint1_Completado.xlsx).
+- [Backlog, seguimiento y retrospectiva del Sprint 3](Fase%202/Evidencias%20Proyecto/Evidencias%20de%20documentaci%C3%B3n/Pethub_Sprint3_Scrum.xlsx).
+- [Carta Gantt](Fase%202/Evidencias%20Proyecto/Evidencias%20de%20documentaci%C3%B3n/Pethub_Carta_Gantt.xlsx).
+
 ## 6. Arquitectura de la solución
 
 La solución utiliza una arquitectura cliente-servidor. El navegador ejecuta el frontend Angular/Ionic, que envía solicitudes HTTP a la API REST de Express. El backend valida los datos y el token JWT, aplica las reglas de negocio y utiliza Prisma para consultar PostgreSQL. Los documentos adjuntos se almacenan en `backend/uploads`, montado como carpeta persistente en Docker.
+
+![Diagrama de arquitectura de Pethub](docs/arquitectura-pethub.svg)
+
+[Ver el diagrama de arquitectura](docs/arquitectura-pethub.svg). Representa el entorno local actual: el frontend se ejecuta fuera de Docker Compose; la API, PostgreSQL y los volúmenes de datos se configuran en el backend.
 
 | Capa | Responsabilidad | Ubicación |
 | --- | --- | --- |
