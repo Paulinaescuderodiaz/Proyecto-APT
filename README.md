@@ -6,7 +6,7 @@ Pethub es una aplicación web dirigida a tutores de mascotas para organizar su i
 
 Incorpora registro e inicio de sesión, gestión de mascotas, vacunas, historial médico, documentos veterinarios, recordatorios dentro de la aplicación, inscripción de donantes, publicación y cierre de solicitudes de sangre y búsqueda por especie y grupo sanguíneo, con prioridad por comuna cuando se indica.
 
-Es un proyecto académico en desarrollo. La búsqueda relaciona datos registrados; la compatibilidad y la aptitud para donar deben confirmarse con un equipo veterinario. El acceso de clínicas, la integración con sus sistemas y el contenido educativo forman parte del alcance por definir.
+Es un proyecto académico en desarrollo. La búsqueda relaciona datos registrados; la compatibilidad y la aptitud para donar deben confirmarse con un equipo veterinario. El alcance vigente es una plataforma web con carnet sanitario, red de donantes y una sección educativa planificada (HU18 / RF-28), cuyo contenido, fuentes, validación y estimación siguen pendientes. El foro y su moderación se retiraron del alcance; se conservan sus identificadores históricos. Las notificaciones son internas: esta entrega no exige push ni una aplicación nativa Android/iOS. El chat o contacto directo, el correo, los nuevos módulos de la práctica y el acceso e integración de clínicas siguen por definir.
 
 ## 2. Tecnologías utilizadas
 
@@ -67,7 +67,7 @@ Abre **http://localhost:4200**. El frontend consulta la API en `http://localhost
 | `/notificaciones` | Avisos de solicitudes coincidentes y marcado como leídos |
 | `/perfil` | Datos de la cuenta y cierre de sesión |
 
-Inicio ofrece accesos a solicitudes, inscripción y búsqueda de donantes. La campana abre las notificaciones, donde puedes consultar todos los avisos, filtrar los no leídos y marcarlos como leídos. Los mensajes y la comunidad todavía muestran “Próximamente”.
+Inicio ofrece accesos a solicitudes, inscripción y búsqueda de donantes. La campana abre las notificaciones, donde puedes consultar todos los avisos, filtrar los no leídos y marcarlos como leídos. Los mensajes y la comunidad todavía muestran “Próximamente”: son elementos heredados de la interfaz; el foro está retirado del alcance y el chat sigue pendiente de decisión. La sección educativa está planificada y aún no se presenta como implementada.
 
 ### Pruebas y apagado
 
