@@ -17,7 +17,7 @@ const donanteRoutes = require("./routes/donante.routes"); // registrar mascotas 
 const solicitudRoutes = require("./routes/solicitud.routes"); // publicar solicitudes de sangre
 const notificacionRoutes = require("./routes/notificacion.routes"); // avisos dentro de la plataforma
 const app = express(); // crea la aplicación Express propiamente tal
-
+const conversacionRoutes = require("./routes/conversacion.routes"); // chat directo entre usuarios
 // --- Middlewares globales ---
 // Estos se ejecutan en TODAS las peticiones, sin importar la ruta.
 
@@ -57,6 +57,8 @@ app.use("/api/recordatorios", recordatorioRoutes);           // ej: GET /api/rec
 app.use("/api/donantes", donanteRoutes);                     // ej: POST /api/donantes
 app.use("/api/solicitudes", solicitudRoutes);                // ej: POST /api/solicitudes
 app.use("/api/notificaciones", notificacionRoutes);          // ej: GET /api/notificaciones
+app.use("/api/conversaciones", conversacionRoutes);          // ej: POST /api/conversaciones
+
 // Se exporta "app" (sin llamar a .listen() aquí) para que:
 // 1) index.js pueda importarla y hacerla escuchar en un puerto real, y
 // 2) los tests con Supertest puedan importarla directo, sin necesidad

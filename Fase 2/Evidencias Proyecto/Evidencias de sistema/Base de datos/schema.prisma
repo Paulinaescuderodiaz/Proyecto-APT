@@ -26,6 +26,9 @@ model Usuario {
   pushToken String? // token del dispositivo para notificaciones push (vacío hasta que el frontend lo implemente)
   solicitudes SolicitudSangre[] // lado inverso: un usuario puede publicar varias solicitudes de sangre
   notificaciones Notificacion[] // lado inverso: un usuario puede recibir muchas notificaciones
+  conversacionesComoA Conversacion[] @relation("ConversacionUsuarioA") // conversaciones donde es el participante A
+  conversacionesComoB Conversacion[] @relation("ConversacionUsuarioB") // conversaciones donde es el participante B
+  mensajesEnviados    Mensaje[]                                       // mensajes que ha escrito
 }
 
 // Representa a cada mascota registrada por un usuario
@@ -113,6 +116,7 @@ model SolicitudSangre {
   estado         String   @default("activa") // "activa" o "resuelta" (RF-13: se retira de las búsquedas)
   createdAt      DateTime @default(now())
   notificaciones Notificacion[] // lado inverso: una solicitud puede generar varias notificaciones
+  
 }
 
 // Aviso que el sistema le crea a un usuario dentro de la plataforma — S4-HU11
@@ -127,4 +131,28 @@ model Notificacion {
   solicitud   SolicitudSangre? @relation(fields: [solicitudId], references: [id])
   leida       Boolean         @default(false) // empieza sin leer; el usuario la marcará como leída
   createdAt   DateTime        @default(now())
+}
+// Conversación directa entre dos usuarios — S4-HU12
+// Para que una pareja tenga UNA sola conversación, guardamos siempre el id menor en A y el mayor en B
+model Conversacion {
+  id         Int       @id @default(autoincrement())
+  usuarioAId Int       // id MENOR de los dos participantes
+  usuarioA   Usuario   @relation("ConversacionUsuarioA", fields: [usuarioAId], references: [id])
+  usuarioBId Int       // id MAYOR de los dos participantes
+  usuarioB   Usuario   @relation("ConversacionUsuarioB", fields: [usuarioBId], references: [id])
+  createdAt  DateTime  @default(now())
+  mensajes   Mensaje[] // lado inverso: una conversación tiene muchos mensajes
+
+  @@unique([usuarioAId, usuarioBId]) // impide crear dos conversaciones para la misma pareja
+}
+
+// Cada mensaje escrito dentro de una conversación — S4-HU12
+model Mensaje {
+  id             Int          @id @default(autoincrement())
+  conversacionId Int
+  conversacion   Conversacion @relation(fields: [conversacionId], references: [id])
+  remitenteId    Int          // quién lo escribió
+  remitente      Usuario      @relation(fields: [remitenteId], references: [id])
+  texto          String
+  createdAt      DateTime     @default(now())
 }
