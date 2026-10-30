@@ -1,5 +1,5 @@
 const prisma = require("../lib/prisma");
-
+const { AVISO_VALIDACION_VETERINARIA } = require("../lib/avisos");
 // Largo máximo de un mensaje, para que nadie mande textos gigantes
 const MAX_MENSAJE = 1000;
 
@@ -66,18 +66,58 @@ async function iniciarConversacion(req, res) {
     const existente = await prisma.conversacion.findUnique({
       where: { usuarioAId_usuarioBId: { usuarioAId, usuarioBId } },
     });
-    if (existente) {
-      return res.status(200).json({ id: existente.id, createdAt: existente.createdAt });
+        if (existente) {
+      // S4-HU13 (escenario 1): al contactar, siempre se muestra el aviso de validación veterinaria
+      return res.status(200).json({
+        id: existente.id,
+        createdAt: existente.createdAt,
+        aviso: AVISO_VALIDACION_VETERINARIA,
+      });
     }
 
     const nueva = await prisma.conversacion.create({ data: { usuarioAId, usuarioBId } });
-    res.status(201).json({ id: nueva.id, createdAt: nueva.createdAt });
+    res.status(201).json({
+      id: nueva.id,
+      createdAt: nueva.createdAt,
+      aviso: AVISO_VALIDACION_VETERINARIA,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error al iniciar la conversación" });
   }
 }
+// S4-HU13 (escenario 1): ver los datos de UNA conversación (con quién hablo) + el aviso veterinario.
+// La pantalla del chat lo usa para mostrar el aviso al abrir una conversación existente.
+async function verConversacion(req, res) {
+  try {
+    const usuarioId = req.usuario.id;
+    const conversacionId = Number(req.params.id);
 
+    if (!Number.isInteger(conversacionId)) {
+      return res.status(400).json({ error: "Id de conversación inválido" });
+    }
+
+    // Solo si participo; si no, 404 (mismo criterio que en los mensajes)
+    const conversacion = await prisma.conversacion.findUnique({
+      where: { id: conversacionId },
+      include: {
+        usuarioA: { select: { id: true, nombre: true } },
+        usuarioB: { select: { id: true, nombre: true } },
+      },
+    });
+    const participa =
+      conversacion && (conversacion.usuarioAId === usuarioId || conversacion.usuarioBId === usuarioId);
+    if (!participa) {
+      return res.status(404).json({ error: "Conversación no encontrada" });
+    }
+
+    const otro = conversacion.usuarioAId === usuarioId ? conversacion.usuarioB : conversacion.usuarioA;
+    res.json({ id: conversacion.id, con: otro, aviso: AVISO_VALIDACION_VETERINARIA });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al obtener la conversación" });
+  }
+}
 // S4-HU12: listar mis conversaciones, con el nombre de la otra persona y el último mensaje.
 // Nunca se exponen correo ni teléfono.
 async function listarMisConversaciones(req, res) {
@@ -170,4 +210,4 @@ async function enviarMensaje(req, res) {
   }
 }
 
-module.exports = { iniciarConversacion, listarMisConversaciones, listarMensajes, enviarMensaje };
+module.exports = { iniciarConversacion, listarMisConversaciones, listarMensajes, enviarMensaje,verConversacion };

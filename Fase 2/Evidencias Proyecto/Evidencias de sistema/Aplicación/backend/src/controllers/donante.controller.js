@@ -1,4 +1,5 @@
 const prisma = require("../lib/prisma");
+const { AVISO_VALIDACION_VETERINARIA } = require("../lib/avisos");
 
 // Confirma que la mascota exista Y que sea del usuario logueado
 // (mismo patrón que usamos en vacunas).
@@ -13,10 +14,19 @@ async function verificarMascotaDelUsuario(mascotaId, usuarioId) {
 async function crearDonante(req, res) {
   try {
     const usuarioId = req.usuario.id; // viene del token
-    const { mascotaId, grupoSanguineo, cumpleRequisitos } = req.body;
+    const { mascotaId, grupoSanguineo, cumpleRequisitos, aptaParaDonar } = req.body;
 
     if (!mascotaId) {
       return res.status(400).json({ error: "Faltan datos: la mascota es obligatoria" });
+    }
+
+    // S4-HU13 (escenario 2): la app NUNCA permite marcar a una mascota como "apta para donar".
+    // Esa aptitud solo la confirma un veterinario de forma presencial.
+    if (aptaParaDonar !== undefined) {
+      return res.status(400).json({
+        error: "La aptitud para donar no se puede marcar desde la app",
+        aviso: AVISO_VALIDACION_VETERINARIA,
+      });
     }
 
     // El dueño debe DECLARAR que su mascota cumple los requisitos para donar.
@@ -52,7 +62,7 @@ async function crearDonante(req, res) {
 
     res.status(201).json({
       ...donante,
-      aviso: "La aptitud médica para donar debe ser validada siempre por un veterinario de forma presencial.",
+      aviso: AVISO_VALIDACION_VETERINARIA,
     });
   } catch (error) {
     console.error(error);

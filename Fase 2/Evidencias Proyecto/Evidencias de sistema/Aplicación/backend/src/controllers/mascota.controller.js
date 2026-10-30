@@ -1,4 +1,5 @@
 const prisma = require("../lib/prisma");
+const { AVISO_VALIDACION_VETERINARIA } = require("../lib/avisos");
 
 async function crearMascota(req, res) {
   try {
@@ -35,9 +36,15 @@ async function listarMascotas(req, res) {
     const mascotas = await prisma.mascota.findMany({
       where: { usuarioId },
       orderBy: { createdAt: "asc" },
+      include: { donante: true }, // trae el registro de donante (o null si no es donante)
     });
 
-    res.json(mascotas);
+    // S4-HU13 (escenario 3): si la mascota es donante, su ficha muestra el aviso de validación veterinaria
+    const resultado = mascotas.map((m) =>
+      m.donante ? { ...m, aviso: AVISO_VALIDACION_VETERINARIA } : m
+    );
+
+    res.json(resultado);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error al obtener las mascotas" });
