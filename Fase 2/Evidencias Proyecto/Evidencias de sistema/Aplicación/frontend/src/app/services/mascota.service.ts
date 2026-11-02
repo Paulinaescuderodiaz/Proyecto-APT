@@ -1,3 +1,4 @@
+import { Donante } from './donante.service';
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable } from "rxjs";
@@ -11,6 +12,8 @@ export interface MascotaBackend {
   foto: string | null;
   usuarioId: number;
   createdAt: string;
+  donante?: Donante | null;
+  aviso?: string;
 }
 
 // Datos editables del formulario. El backend determina el propietario a partir de la sesión.
