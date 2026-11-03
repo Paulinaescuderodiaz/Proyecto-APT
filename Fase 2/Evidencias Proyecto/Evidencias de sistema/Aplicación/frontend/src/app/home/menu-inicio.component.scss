@@ -1,0 +1,42 @@
+:host { display: block; }
+* { box-sizing: border-box; }
+a, button { -webkit-tap-highlight-color: transparent; }
+a { text-decoration: none; }
+button { font: inherit; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--verde); outline-offset: 4px; }
+.menu-inferior {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 6px 4px;
+}
+
+.menu-inferior a,
+.menu-inferior button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 56px;
+  padding: 5px 0;
+  border: 0;
+  background: transparent;
+  color: var(--secundario);
+  font-size: 10px;
+}
+
+.menu-inferior ion-icon {
+  font-size: 23px;
+}
+
+.menu-inferior .activo {
+  color: var(--verde);
+  font-weight: 700;
+}
+
+.menu-inferior button:disabled {
+  opacity: 0.55;
+}
+

@@ -3,18 +3,16 @@ import {
   ChangeDetectorRef,
   OnDestroy,
 } from '@angular/core';
+import { ListaMascotasInicioComponent } from './lista-mascotas-inicio.component';
+import { MenuInicioComponent } from './menu-inicio.component';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { IonContent, IonFooter, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
-  homeOutline,
   pawOutline,
   waterOutline,
-  peopleOutline,
-  personOutline,
   heartOutline,
-  addOutline,
   chatbubbleOutline,
   notificationsOutline,
 } from 'ionicons/icons';
@@ -34,7 +32,7 @@ import {
   standalone: true,
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
-  imports: [IonContent, IonFooter, IonIcon, RouterLink, DatePipe],
+  imports: [IonContent, IonFooter, IonIcon, RouterLink, DatePipe, ListaMascotasInicioComponent, MenuInicioComponent],
 })
 export class HomePage implements OnDestroy {
   nombreUsuario = '';
@@ -59,13 +57,9 @@ export class HomePage implements OnDestroy {
     private recordatorioService: RecordatorioService
   ) {
     addIcons({
-      homeOutline,
       pawOutline,
       waterOutline,
-      peopleOutline,
-      personOutline,
       heartOutline,
-      addOutline,
       chatbubbleOutline,
       notificationsOutline,
     });
