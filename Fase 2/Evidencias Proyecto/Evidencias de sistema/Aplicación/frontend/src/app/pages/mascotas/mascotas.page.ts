@@ -5,6 +5,7 @@ import { MascotaService } from '../../services/mascota.service';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HistorialMedicoComponent } from '../../components/historial-medico.component';
 import { VacunasComponent } from '../../components/vacunas.component';
+import { Donante } from '../../services/donante.service';
 import { DonanteComponent } from '../../components/donante.component';
 // Modelo de la vista: los valores null de la API se convierten en cadenas vacías al cargar.
 interface Mascota {
@@ -13,6 +14,8 @@ interface Mascota {
   especie: string;
   raza: string;
   foto?: string;
+  donante?: Donante | null;
+  aviso?: string;
 }
 
 @Component({
@@ -79,6 +82,8 @@ export class MascotasPage implements OnInit {
           especie: m.especie,
           raza: m.raza ?? '',
           foto: m.foto ?? '',
+          donante: m.donante ?? null,
+          aviso: m.aviso,
         }));
 
         // Ejemplo de URL: /mascotas?mascotaId=1.
@@ -147,6 +152,15 @@ export class MascotasPage implements OnInit {
     this.mascotaSeleccionada = mascota;
   }
 
+  // Conserva la inscripción y el aviso al cerrar y reabrir la ficha.
+  registrarDonante(donante: Donante): void {
+    const mascota = this.mascotas.find(m => m.id === donante.mascotaId);
+    if (mascota) {
+      mascota.donante = donante;
+      mascota.aviso = donante.aviso;
+    }
+  }
+
   // Cierra la ficha sin volver a consultar la API.
   volverAlListado(): void {
     this.mascotaSeleccionada = null;
@@ -194,6 +208,9 @@ export class MascotasPage implements OnInit {
             especie: mascotaActualizada.especie,
             raza: mascotaActualizada.raza ?? '',
             foto: mascotaActualizada.foto ?? '',
+            // La actualización de datos no devuelve la relación de donante.
+            donante: this.mascotas.find(m => m.id === mascotaActualizada.id)?.donante,
+            aviso: this.mascotas.find(m => m.id === mascotaActualizada.id)?.aviso,
           };
 
           this.mascotas = this.mascotas.map(mascota =>

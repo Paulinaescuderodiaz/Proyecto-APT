@@ -1,6 +1,8 @@
 import {
   Component,
   Input,
+  Output,
+  EventEmitter,
   OnChanges,
   OnDestroy,
   ChangeDetectorRef,
@@ -32,7 +34,7 @@ import { Donante, DonanteService } from '../services/donante.service';
           </p>
           <p>
             <strong>Estado:</strong>
-            {{ datos.estado === 'activo' ? 'Activo' : 'Pendiente de tipificación' }}
+            {{ datos.estado === 'activo' ? 'Activo en la red (grupo conocido)' : 'Pendiente de tipificación' }}
           </p>
           <p>La inscripción se guardó correctamente.</p>
         </div>
@@ -99,10 +101,11 @@ import { Donante, DonanteService } from '../services/donante.service';
         </form>
       }
 
-      <p class="nota">
-        La inscripción no confirma que la mascota sea apta para donar.
-        Esa evaluación corresponde al equipo veterinario.
-      </p>
+      <aside class="nota" aria-label="Validación veterinaria">
+        <strong>Evaluación veterinaria obligatoria</strong>
+        <p>{{ registro?.aviso || avisoVeterinario || avisoPredeterminado }}</p>
+        <p>La inscripción y el estado activo en la red no confirman aptitud médica.</p>
+      </aside>
     </section>
   `,
   styles: [`
@@ -197,6 +200,12 @@ import { Donante, DonanteService } from '../services/donante.service';
 export class DonanteComponent implements OnChanges, OnDestroy {
   @Input() mascotaId = 0;
   @Input() nombreMascota = '';
+  @Input() registroInicial: Donante | null = null;
+  @Input() avisoVeterinario = '';
+  @Output() inscripcionRegistrada = new EventEmitter<Donante>();
+
+  readonly avisoPredeterminado =
+    'La aptitud médica para donar debe ser validada siempre por un veterinario de forma presencial.';
 
   conoceGrupo = false;
   grupoSanguineo = '';
@@ -220,7 +229,7 @@ export class DonanteComponent implements OnChanges, OnDestroy {
     this.acepta = false;
     this.error = '';
     this.guardando = false;
-    this.registro = null;
+    this.registro = this.registroInicial;
   }
 
   cambiarConocimiento(): void {
@@ -270,6 +279,7 @@ export class DonanteComponent implements OnChanges, OnDestroy {
       next: (donante) => {
         // Usa la respuesta real para mostrar la inscripción confirmada.
         this.registro = donante;
+        this.inscripcionRegistrada.emit(donante);
         this.guardando = false;
         this.cdr.detectChanges();
       },

@@ -217,4 +217,36 @@ describe('DonanteComponent — S3-HU08', () => {
       .toContain('Inscripción registrada');
     expect(componente.error).toBe('');
   });
+  it('muestra el aviso presencial antes de inscribir y no ofrece marcar aptitud', () => {
+    expect(fixture.nativeElement.textContent).toContain(
+      'La aptitud médica para donar debe ser validada siempre por un veterinario de forma presencial.'
+    );
+    expect(fixture.nativeElement.querySelector('[name="aptaParaDonar"]')).toBeNull();
+  });
+
+  it('recupera una inscripción existente y conserva el aviso al reabrir la ficha', () => {
+    fixture.componentRef.setInput('registroInicial', respuesta('activo'));
+    fixture.componentRef.setInput('avisoVeterinario', 'Aviso persistente de evaluación presencial');
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Inscripción registrada');
+    expect(fixture.nativeElement.textContent).toContain('Aviso persistente de evaluación presencial');
+    expect(fixture.nativeElement.querySelector('form')).toBeNull();
+    httpMock.expectNone(url);
+  });
+
+  it('muestra el aviso de la API y comunica la inscripción para conservarla en la ficha', async () => {
+    let guardado: unknown;
+    componente.inscripcionRegistrada.subscribe(dato => guardado = dato);
+    await preparar(true);
+    enviar();
+    const datos = { ...respuesta('activo'), aviso: 'Evaluación presencial requerida por el veterinario' };
+    const req = httpMock.expectOne(url);
+    expect(req.request.body.aptaParaDonar).toBeUndefined();
+    req.flush(datos);
+    fixture.detectChanges();
+    expect(guardado).toEqual(datos);
+    expect(fixture.nativeElement.textContent).toContain(datos.aviso);
+    expect(fixture.nativeElement.textContent).toContain('no confirman aptitud médica');
+  });
+
 });
