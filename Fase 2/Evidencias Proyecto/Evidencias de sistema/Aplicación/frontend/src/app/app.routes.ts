@@ -68,6 +68,15 @@ export const routes: Routes = [
   },
 
   {
+    path: 'conversaciones', canActivate: [authGuard],
+    loadComponent: () => import('./pages/conversaciones/conversaciones.page').then(m => m.ConversacionesPage),
+  },
+  {
+    path: 'conversaciones/:id', canActivate: [authGuard],
+    loadComponent: () => import('./pages/conversaciones/conversaciones.page').then(m => m.ConversacionesPage),
+  },
+
+  {
     path: 'notificaciones',
     canActivate: [authGuard],
     loadComponent: () =>
