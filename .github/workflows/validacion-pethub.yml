@@ -1,0 +1,90 @@
+name: Validación Pethub
+
+# Cada rama comprueba su propio código antes de integrarlo.
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pethub-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend — pruebas y producción
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: 'Fase 2/Evidencias Proyecto/Evidencias de sistema/Aplicación/frontend'
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '26'
+          cache: npm
+          cache-dependency-path: 'Fase 2/Evidencias Proyecto/Evidencias de sistema/Aplicación/frontend/package-lock.json'
+      - name: Instalar dependencias del lockfile
+        run: npm ci
+      - name: Probar componentes y servicios
+        run: npm test -- --watch=false
+      - name: Compilar producción
+        run: npm run build
+
+  backend:
+    name: Backend — API con PostgreSQL
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: 'Fase 2/Evidencias Proyecto/Evidencias de sistema/Aplicación/backend'
+    # Credenciales exclusivas de esta base efímera; no son las de desarrollo.
+    env:
+      DATABASE_URL: postgresql://pethub_ci:pethub_ci@localhost:5432/pethub_test?schema=public
+      JWT_SECRET: pethub-ci-solo-pruebas-base-efimera
+      TZ: UTC
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: pethub_ci
+          POSTGRES_PASSWORD: pethub_ci
+          POSTGRES_DB: pethub_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pethub_ci -d pethub_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '26'
+          cache: npm
+          cache-dependency-path: 'Fase 2/Evidencias Proyecto/Evidencias de sistema/Aplicación/backend/package-lock.json'
+      - name: Instalar dependencias del lockfile
+        run: npm ci
+      - name: Generar cliente de Prisma
+        run: npx --no-install prisma generate
+      - name: Aplicar migraciones existentes
+        run: npx --no-install prisma migrate deploy
+      - name: Comprobar estado de migraciones
+        run: npx --no-install prisma migrate status
+      - name: Preparar carpeta de documentos de prueba
+        run: mkdir -p uploads
+      - name: Probar API y persistencia
+        run: npm test -- --ci
