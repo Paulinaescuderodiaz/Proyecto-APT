@@ -128,7 +128,7 @@ try{
  await page.locator('app-conversaciones').getByRole('complementary',{name:'Validación veterinaria'}).scrollIntoViewIfNeeded();await pause(3500);
  await type(page.locator('#mensaje'),'Hola Ana, ¿podemos coordinar una evaluación veterinaria para Luna?');
  await click(page.getByRole('button',{name:'Enviar mensaje',exact:true}));
- await page.getByText('Hola Ana, ¿podemos coordinar una evaluación veterinaria para Luna?',{exact:true}).waitFor();await pause(3000);
+ await page.locator('ol[aria-label="Mensajes de la conversación"]').getByText('Hola Ana, ¿podemos coordinar una evaluación veterinaria para Luna?',{exact:true}).waitFor();await pause(3000);
  await cambiarCuenta(ana);
  await page.getByRole('link',{name:'Notificaciones de solicitudes de sangre',exact:true}).click();
  await page.getByRole('heading',{name:'Solicitud de sangre compatible',exact:true}).waitFor();
@@ -138,12 +138,12 @@ try{
  await page.getByRole('link',{name:'Mateo Demo',exact:true}).waitFor();
  await caption('Conversaciones guardadas','La otra persona ve el mensaje en su cuenta y puede responder desde la misma conversación.');await pause();
  await click(page.getByRole('link',{name:'Mateo Demo',exact:true}));
- await page.getByText('Hola Ana, ¿podemos coordinar una evaluación veterinaria para Luna?',{exact:true}).waitFor();
+ await page.locator('ol[aria-label="Mensajes de la conversación"]').getByText('Hola Ana, ¿podemos coordinar una evaluación veterinaria para Luna?',{exact:true}).waitFor();
  await type(page.locator('#mensaje'),'Hola Mateo, sí. Coordinemos la evaluación presencial con la clínica.');
  await click(page.getByRole('button',{name:'Enviar mensaje',exact:true}));
- await page.getByText('Hola Mateo, sí. Coordinemos la evaluación presencial con la clínica.',{exact:true}).waitFor();await pause(2000);
+ await page.locator('ol[aria-label="Mensajes de la conversación"]').getByText('Hola Mateo, sí. Coordinemos la evaluación presencial con la clínica.',{exact:true}).waitFor();await pause(2000);
  await page.reload();
- await page.getByText('Hola Mateo, sí. Coordinemos la evaluación presencial con la clínica.',{exact:true}).waitFor();
+ await page.locator('ol[aria-label="Mensajes de la conversación"]').getByText('Hola Mateo, sí. Coordinemos la evaluación presencial con la clínica.',{exact:true}).waitFor();
  await caption('Persistencia y aviso','Al recargar se conservan los mensajes y el aviso veterinario. Los mensajes nuevos se consultan con Actualizar.');
  await page.locator('app-conversaciones').getByRole('complementary',{name:'Validación veterinaria'}).scrollIntoViewIfNeeded();await pause(4000);
  assert.equal(page.url(),conversacionUrl);
