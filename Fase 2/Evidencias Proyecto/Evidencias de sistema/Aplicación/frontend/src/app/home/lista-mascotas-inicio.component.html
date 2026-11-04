@@ -1,0 +1,35 @@
+<div class="lista-mascotas">
+  @for (mascota of mascotas; track mascota.id) {
+    <a
+      class="tarjeta-mascota"
+      routerLink="/mascotas"
+      [queryParams]="{ mascotaId: mascota.id }"
+      [attr.aria-label]="'Ver ficha de ' + mascota.nombre"
+    >
+      <div class="foto-mascota">
+        @if (mascota.foto) {
+          <img
+            [src]="mascota.foto"
+            [alt]="'Foto de ' + mascota.nombre"
+            (error)="fotoFallida.emit(mascota)"
+          />
+        } @else {
+          <ion-icon
+            name="paw-outline"
+            aria-hidden="true"
+          ></ion-icon>
+        }
+      </div>
+
+      <div class="datos-mascota">
+        <h3>{{ mascota.nombre }}</h3>
+        <p>{{ mascota.raza || mascota.especie }}</p>
+      </div>
+    </a>
+  }
+
+  <a class="tarjeta-agregar" routerLink="/mascotas">
+    <ion-icon name="add-outline" aria-hidden="true"></ion-icon>
+    <span>Gestionar mascotas</span>
+  </a>
+</div>

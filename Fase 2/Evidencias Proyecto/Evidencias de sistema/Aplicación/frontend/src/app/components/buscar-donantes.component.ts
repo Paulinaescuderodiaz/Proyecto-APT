@@ -1,10 +1,11 @@
+import { ConversacionService } from '../services/conversacion.service';
 import {
   Component,
   OnDestroy,
   ChangeDetectorRef,
 } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { IonContent } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import {
@@ -86,6 +87,8 @@ import {
           }
         </section>
 
+        @if (errorContacto) { <p class="error" role="alert">{{ errorContacto }}</p> }
+        <a routerLink="/conversaciones">Mis conversaciones</a>
         <section class="panel" aria-labelledby="titulo-resultados">
           <h2 id="titulo-resultados">Resultados</h2>
 
@@ -116,6 +119,9 @@ import {
                   <strong>Comuna:</strong>
                   {{ donante.comuna || 'Sin especificar' }}
                 </p>
+                <button type="button" (click)="contactar(donante.id)" [disabled]="contactando !== null">
+                  {{ contactando === donante.id ? 'Abriendo…' : 'Contactar al tutor' }}
+                </button>
               </article>
             }
 
@@ -237,10 +243,16 @@ export class BuscarDonantesComponent implements OnDestroy {
   busquedaRealizada = false;
   error = '';
 
+  contactando: number | null = null;
+  errorContacto = '';
+  private destruido = false;
+  private contacto?: Subscription;
   private consulta?: Subscription;
 
   constructor(
     private servicio: DonanteService,
+    private conversaciones: ConversacionService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -289,7 +301,36 @@ export class BuscarDonantesComponent implements OnDestroy {
     });
   }
 
+  contactar(id: number): void {
+    if (this.contactando !== null) return;
+    this.errorContacto = '';
+    this.contactando = id;
+    this.contacto = this.conversaciones.contactar(id).subscribe({
+      next: async conversacion => {
+        try {
+          const abierta = await this.router.navigate(['/conversaciones', conversacion.id]);
+          if (!abierta) this.errorContacto = 'No pudimos abrir la conversación. Intenta desde Mis conversaciones.';
+        } catch {
+          this.errorContacto = 'No pudimos abrir la conversación. Intenta desde Mis conversaciones.';
+        } finally {
+          this.contactando = null;
+          if (!this.destruido) this.cdr.detectChanges();
+        }
+      },
+      error: error => {
+        this.contactando = null;
+        this.errorContacto = error.status === 401 ? 'Tu sesión no es válida. Vuelve a iniciar sesión.'
+          : error.status === 400 ? 'No puedes contactar a tu propia mascota.'
+          : error.status === 404 ? 'Este donante ya no está disponible.'
+          : 'No pudimos iniciar el contacto. Intenta nuevamente.';
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
   ngOnDestroy(): void {
+    this.destruido = true;
+    this.contacto?.unsubscribe();
     this.consulta?.unsubscribe();
   }
 }

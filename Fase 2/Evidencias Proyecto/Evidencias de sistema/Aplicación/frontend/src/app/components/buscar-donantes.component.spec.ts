@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { BuscarDonantesComponent } from './buscar-donantes.component';
 
 describe('BuscarDonantesComponent — S3-HU10', () => {
@@ -25,4 +25,54 @@ describe('BuscarDonantesComponent — S3-HU10', () => {
  it('evita búsquedas duplicadas mientras espera la respuesta', async () => { await completar(); await enviar(); await enviar(); solicitud().flush({ donantes: [] }); fixture.detectChanges(); });
  it('limpia resultados anteriores y permite reintentar tras un error', async () => { await completar(); await enviar(); solicitud().flush({ donantes: [donante] }); fixture.detectChanges(); await enviar(); expect(componente.donantes).toHaveLength(0); solicitud().flush({}, { status: 500, statusText: 'Server Error' }); fixture.detectChanges(); expect(componente.busquedaRealizada).toBe(false); expect(componente.error).toContain('No pudimos buscar'); await enviar(); solicitud().flush({ donantes: [donante] }); fixture.detectChanges(); expect(componente.error).toBe(''); expect(componente.donantes).toHaveLength(1); });
  it('informa cuando la sesión no es válida', async () => { await completar(); await enviar(); solicitud().flush({}, { status: 401, statusText: 'Unauthorized' }); fixture.detectChanges(); expect(fixture.nativeElement.textContent).toContain('Tu sesión no es válida'); });
+ it('abre o recupera el contacto con el id de donante y evita duplicados', async () => {
+   const navegar = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+   componente.contactar(3); componente.contactar(3);
+   const req = http.expectOne('http://localhost:3000/api/conversaciones');
+   expect(req.request.body).toEqual({ donanteId: 3 });
+   expect(req.request.headers.get('Authorization')).toBe('Bearer token-prueba');
+   req.flush({ id: 4, aviso: 'Evaluación veterinaria presencial' });
+   await fixture.whenStable();
+   expect(navegar).toHaveBeenCalledWith(['/conversaciones', 4]);
+   expect(componente.contactando).toBeNull();
+ });
+ it('informa cuando el donante ya no está disponible y permite reintentar', () => {
+   componente.contactar(3);
+   http.expectOne('http://localhost:3000/api/conversaciones').flush({}, { status: 404, statusText: 'Not Found' });
+   expect(componente.errorContacto).toContain('ya no está disponible');
+   expect(componente.contactando).toBeNull();
+ });
+
+ it('reabre una conversación existente devuelta por el backend con HTTP 200', async () => {
+   const navegar = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+   componente.contactar(3);
+   http.expectOne('http://localhost:3000/api/conversaciones').flush(
+     { id: 4, aviso: 'Evaluación veterinaria presencial' },
+     { status: 200, statusText: 'OK' }
+   );
+   await fixture.whenStable();
+   expect(navegar).toHaveBeenCalledWith(['/conversaciones', 4]);
+ });
+ it('no navega cuando el backend rechaza contactar a la propia mascota', () => {
+   const navegar = vi.spyOn(TestBed.inject(Router), 'navigate');
+   componente.contactar(3);
+   http.expectOne('http://localhost:3000/api/conversaciones').flush({}, { status: 400, statusText: 'Bad Request' });
+   expect(navegar).not.toHaveBeenCalled();
+   expect(componente.errorContacto).toContain('propia mascota');
+ });
+ it('informa que la sesión caducó al intentar contactar', () => {
+   componente.contactar(3);
+   http.expectOne('http://localhost:3000/api/conversaciones').flush({}, { status: 401, statusText: 'Unauthorized' });
+   expect(componente.errorContacto).toContain('Vuelve a iniciar sesión');
+   expect(componente.contactando).toBeNull();
+ });
+ it('permite recuperar la conversación si falla la navegación', async () => {
+   vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(false);
+   componente.contactar(3);
+   http.expectOne('http://localhost:3000/api/conversaciones').flush({ id: 4 });
+   await fixture.whenStable();
+   expect(componente.errorContacto).toContain('Mis conversaciones');
+   expect(componente.contactando).toBeNull();
+ });
+
 });

@@ -20,19 +20,21 @@ Aplicación para organizar el cuidado de mascotas y desarrollar una comunidad de
 - Perfil de solo lectura con nombre y correo, y cierre de sesión en el navegador.
 - Comentarios en español en el código para facilitar la revisión del equipo.
 
-### Implementado en el backend, pendiente de integrar en pantallas
+### Módulos incorporados después de la primera versión
 
-- Registro, listado y actualización de vacunas.
-- Creación y consulta de registros médicos.
-- Carga de documentos JPEG, PNG o PDF asociados a un registro médico, hasta 5 MB.
+- Rutas de cuenta protegidas mediante `authGuard`; el backend valida el JWT en las consultas.
+- Carnet con vacunas, historial médico, documentos y recordatorios de vacunas.
+- Inscripción voluntaria de donantes desde la ficha de mascota, búsqueda y solicitudes de sangre.
+- Notificaciones internas de solicitudes de sangre.
+- En la rama `feat/contacto-web`: conversaciones entre tutores, envío de mensajes y actualización manual. El aviso de evaluación veterinaria presencial permanece visible al abrir una conversación.
 
-### Pendiente
+### Validación pendiente
 
-- Protección de rutas del frontend mediante guards de sesión. El perfil comprueba la presencia del token, pero las rutas aún no tienen guards.
-- Solicitudes de donación, inscripción de donantes, comunidad, mensajes y notificaciones. Los accesos correspondientes del inicio se muestran como próximos o deshabilitados.
-- Edición del perfil.
-- Unificar la ayuda de la foto de mascota: el formulario anuncia 10 MB, mientras la validación del frontend permite 5 MB.
-- Completar la integración y las pruebas de los módulos pendientes.
+- Completar la prueba del contacto entre dos cuentas con backend y PostgreSQL en el equipo de desarrollo. Un servidor que muestra el puerto 3000 no demuestra que la migración del chat esté aplicada.
+- Verificar visualmente la aplicación real después de los cambios. Las pruebas de componentes no sustituyen esta revisión.
+- Integrar la rama de contacto después de su revisión. No se declara mensajería en tiempo real.
+- Definir el contenido y la validación de la sección educativa pendiente. Foro y moderación están fuera del alcance web acordado.
+- Edición del perfil y revisión de coherencia de límites de carga de fotos.
 
 ## Tecnologías
 
@@ -60,9 +62,9 @@ El frontend consulta la API HTTP del backend. El backend utiliza Prisma para acc
 | `backend/src/routes/` | Rutas de la API |
 | `backend/src/middleware/` | Verificación del token |
 | `backend/prisma/` | Modelo de datos y migraciones |
-| `backend/tests/` | Pruebas de autenticación y mascotas |
+| `backend/tests/` | Pruebas de los módulos de la API, incluidas conversaciones y aviso veterinario |
 
-Modelos de datos: **Usuario, Mascota, Vacuna, RegistroMedico y Documento**.
+Modelos de datos: **Usuario, Mascota, Vacuna, RegistroMedico, Documento, Recordatorio, Donante, SolicitudSangre, Notificacion, Conversacion y Mensaje**.
 
 ## Preparación local
 
@@ -139,14 +141,14 @@ Abre otra terminal en la carpeta `Aplicación`:
 ```powershell
 cd frontend
 npm.cmd install
-npm.cmd start -- --port 8100
+npm.cmd start -- --port 4200
 ```
 
-Abre **http://localhost:8100**. La raíz muestra la bienvenida; después de iniciar sesión se abre `/home`.
+Abre **http://localhost:4200**. La raíz muestra la bienvenida; después de iniciar sesión se abre `/home`.
 
 Si ya tienes Ionic CLI instalado, también puedes iniciar el frontend desde su carpeta con `ionic.cmd serve`.
 
-Las direcciones de la API están definidas actualmente en `auth.service.ts` y `mascota.service.ts` como `http://localhost:3000/api/...`. Si cambias el host o el puerto del backend, actualiza ambos servicios. En un teléfono, `localhost` apunta al propio teléfono, no al computador.
+Las direcciones de la API están definidas en los archivos `frontend/src/app/services/*.service.ts` como `http://localhost:3000/api/...`. Si cambias el host o el puerto del backend, revisa todos los servicios que llaman a la API. En un teléfono, `localhost` apunta al propio teléfono, no al computador.
 
 ## Rutas de la aplicación
 
@@ -158,6 +160,11 @@ Las direcciones de la API están definidas actualmente en `auth.service.ts` y `m
 | `/home` | Inicio y resumen de mascotas |
 | `/mascotas` | Listado, formulario y detalle |
 | `/perfil` | Datos de cuenta y cierre de sesión |
+| `/solicitudes-sangre` | Publicación y gestión de solicitudes |
+| `/buscar-donantes` | Búsqueda y contacto con el tutor |
+| `/notificaciones` | Avisos internos de solicitudes |
+| `/conversaciones` | Lista de conversaciones en la rama de contacto |
+| `/conversaciones/:id` | Mensajes y aviso veterinario en la rama de contacto |
 
 ## API principal
 
@@ -185,6 +192,40 @@ Actualmente los archivos de `uploads` se sirven públicamente en `/uploads`; deb
 ## Sesión
 
 El login guarda `pethub_token` y `pethub_usuario` en el almacenamiento local del navegador. Cerrar sesión elimina ambos valores, pero no elimina la cuenta ni sus mascotas. La presencia del token en el frontend no garantiza su validez: el backend verifica las solicitudes protegidas.
+
+## Preparar y comprobar el contacto web del Sprint 4
+
+Usa una copia que incluya la rama de contacto. Desde la raíz del repositorio entra a la carpeta correcta:
+
+```powershell
+cd "Fase 2/Evidencias Proyecto/Evidencias de sistema/Aplicación/backend"
+```
+
+Si el backend está ejecutándose, detén **su terminal** con `Ctrl+C` antes de regenerar Prisma. Ejecuta estos comandos uno a uno y continúa solo si cada uno termina correctamente:
+
+```powershell
+npx.cmd prisma migrate deploy
+npx.cmd prisma generate
+npx.cmd prisma migrate status
+npm.cmd start
+```
+
+`migrate deploy` aplica las migraciones existentes. No uses `migrate reset` para resolver este problema: elimina datos. El estado debe indicar que no quedan migraciones pendientes, incluida `20261027234909_agregar_chat`.
+
+Si `prisma generate` falla con `EPERM` al renombrar `query_engine-windows.dll.node`, algún proceso o protección del sistema puede estar usando el archivo. Comprueba que detuviste el backend de este proyecto y vuelve a generar. No cierres indiscriminadamente todos los procesos Node ni ejecutes comandos que borren la base.
+
+Con el frontend abierto en `http://localhost:4200`, comprueba:
+
+1. Cuenta A: inscribir una mascota donante con grupo conocido. Esto es inscripción voluntaria; no certifica aptitud médica.
+2. Cuenta B, en otro perfil del navegador o incógnito: iniciar sesión, buscar ese donante y pulsar **Contactar al tutor**. No uses la misma cuenta dueña de la mascota.
+3. Confirmar que se abre la conversación y se muestra el aviso veterinario presencial.
+4. Enviar un mensaje desde B. Desde A, abrir **Mis conversaciones**, entrar al mismo contacto y pulsar **Actualizar mensajes** para verlo.
+5. Responder desde A y actualizar desde B. Recargar y volver a contactar: debe recuperarse la misma conversación y conservar los mensajes y el aviso.
+6. Una tercera cuenta no debe poder leer ni escribir en esa conversación. Debe mostrarse el rechazo de acceso.
+
+Estas comprobaciones están pendientes en el equipo de Paulina; no se registran como aprobadas por estar documentadas. La actualización de mensajes es manual.
+
+Si aparece un error, abre DevTools → **Network**, selecciona la petición `conversaciones` que falla y revisa **Response**. Guarda el estado HTTP y el mensaje, sin compartir tokens. Un `204` de tipo `preflight` es la comprobación CORS, no el resultado del contacto. Un `400` puede indicar que se intenta contactar a la propia cuenta; un `500` requiere revisar el detalle de la terminal que mantiene el backend iniciado.
 
 ## Pruebas y compilación
 
@@ -218,7 +259,12 @@ Comprobación manual del flujo principal:
 | Síntoma | Qué revisar |
 | --- | --- |
 | No conecta con la API | Mantener el backend iniciado y comprobar el puerto 3000 |
-| `MODULE_NOT_FOUND` | Ejecutar `npm.cmd install` dentro de `backend` |
+| `MODULE_NOT_FOUND` al buscar `Proyecto-APT/index.js` | Se ejecutó desde la raíz: entrar a la carpeta `backend` antes de `npm.cmd start` |
+| Otro `MODULE_NOT_FOUND` de una dependencia | Ejecutar `npm.cmd install` dentro de `backend` |
+| Docker no se reconoce | Usar la preparación local con PostgreSQL y `npm.cmd start` descrita arriba; Docker es una alternativa |
+| Contactar devuelve `400` | Revisar Response; si es contacto propio, probar con otra cuenta |
+| Contactar devuelve `500` | Revisar el error del backend y el estado de las migraciones, especialmente `agregar_chat` |
+| Prisma devuelve `EPERM` sobre la DLL | Detener el backend del proyecto antes de regenerar el cliente |
 | `secretOrPrivateKey must have a value` | Definir `JWT_SECRET` en `backend/.env` y reiniciar el backend |
 | Error de conexión de Prisma | Revisar PostgreSQL, `DATABASE_URL` y migraciones |
 | Registro responde 409 | El correo ya está registrado; iniciar sesión o usar otro |
@@ -227,7 +273,7 @@ Comprobación manual del flujo principal:
 | No se puede cargar un documento | Comprobar que existe `backend/uploads`, el formato y el máximo de 5 MB |
 
 
-## Ejecutar el backend con Docker
+## Alternativa: ejecutar el backend con Docker
 
 Requisitos: tener Docker Desktop instalado y abierto.
 

@@ -1,0 +1,43 @@
+<ion-content>
+  <main class="pagina">
+    <a routerLink="/home">← Inicio</a>
+    <h1>Mensajes</h1>
+    <aside class="aviso" aria-label="Validación veterinaria">
+      <strong>Evaluación veterinaria obligatoria</strong>
+      <p>{{ seleccionada?.aviso || aviso }}</p>
+      <p>Pethub facilita el contacto; no certifica compatibilidad ni aptitud médica.</p>
+    </aside>
+    @if (error) { <p class="error" role="alert">{{ error }}</p> }
+    @if (cargando) { <p role="status">Cargando…</p> }
+    @if (seleccionada; as conversacion) {
+      <section aria-labelledby="titulo-conversacion">
+        <a routerLink="/conversaciones">← Mis conversaciones</a>
+        <h2 id="titulo-conversacion">{{ conversacion.con.nombre }}</h2>
+        <p>Presiona Actualizar para consultar mensajes nuevos.</p>
+        <button type="button" (click)="actualizar()" [disabled]="cargando || enviando">Actualizar mensajes</button>
+        <ol aria-label="Mensajes de la conversación">
+          @for (mensaje of mensajes; track mensaje.id) {
+            <li [class.propio]="mensaje.esMio">
+              <strong>{{ mensaje.esMio ? 'Tú' : conversacion.con.nombre }}</strong>
+              <p>{{ mensaje.texto }}</p>
+            </li>
+          } @empty { <li>Aún no hay mensajes. Puedes iniciar la conversación.</li> }
+        </ol>
+        <form (ngSubmit)="enviar()">
+          <label for="mensaje">Tu mensaje</label>
+          <textarea id="mensaje" name="texto" [(ngModel)]="texto" required maxlength="1000" rows="4" [disabled]="enviando" aria-describedby="limite-mensaje"></textarea>
+          <p id="limite-mensaje">Máximo 1000 caracteres.</p>
+          <button type="submit" [disabled]="enviando || cargando">{{ enviando ? 'Enviando…' : 'Enviar mensaje' }}</button>
+        </form>
+      </section>
+    } @else if (!cargando && !error) {
+      <section aria-label="Mis conversaciones">
+        @for (conversacion of conversaciones; track conversacion.id) {
+          <article><h2><a [routerLink]="['/conversaciones', conversacion.id]">{{ conversacion.con.nombre }}</a></h2>
+            <p>{{ conversacion.ultimoMensaje || 'Sin mensajes todavía' }}</p></article>
+        } @empty { <p>No tienes conversaciones. Busca un donante para contactar a su tutor.</p> }
+        <a routerLink="/buscar-donantes">Buscar donantes</a>
+      </section>
+    }
+  </main>
+</ion-content>
