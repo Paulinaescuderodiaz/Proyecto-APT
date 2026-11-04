@@ -13,10 +13,23 @@ for(const user of [ana,mateo]){
  const res=await fetch(`${api}/auth/registro`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(user)});
  assert.equal(res.status,201,`No se creó la cuenta de prueba (${res.status})`);
 }
-const browser=await chromium.launch({headless:true,slowMo:70});
-const context=await browser.newContext({viewport:{width:1280,height:720},recordVideo:{dir:out,size:{width:1280,height:720}},locale:'es-CL',colorScheme:'light',reducedMotion:'reduce'});
+const browser=await chromium.launch({channel:'chrome',headless:true,slowMo:70});
+const context=await browser.newContext({viewport:{width:1280,height:720},locale:'es-CL',colorScheme:'light',reducedMotion:'reduce'});
 const page=await context.newPage();
 page.setDefaultTimeout(20000);
+// Captura los fotogramas reales de Chrome sin descargar otro navegador.
+const framesDir='/tmp/pethub-demo-frames';
+await fs.mkdir(framesDir,{recursive:true});
+const cdp=await context.newCDPSession(page);
+const frames=[];
+const writes=[];
+cdp.on('Page.screencastFrame',event=>{
+ const name=`frame-${String(frames.length).padStart(8,'0')}.jpg`;
+ frames.push({name,time:Date.now()/1000});
+ writes.push(fs.writeFile(`${framesDir}/${name}`,Buffer.from(event.data,'base64')));
+ cdp.send('Page.screencastFrameAck',{sessionId:event.sessionId}).catch(()=>{});
+});
+await cdp.send('Page.startScreencast',{format:'jpeg',quality:85,maxWidth:1280,maxHeight:720,everyNthFrame:1});
 const failures=[];
 page.on('response',res=>{if(res.url().startsWith(api)&&res.status()>=400) failures.push(`${res.status()} ${res.url()}`);});
 page.on('pageerror',error=>failures.push(error.message));
@@ -141,8 +154,17 @@ try{
  await fs.writeFile(`${out}/resultado.json`,JSON.stringify({success:true,flow:'Login, mascota, vacuna, inscripción, solicitud, búsqueda, contacto, aviso, notificación, respuesta y persistencia',apiErrors:failures,commit:process.env.GITHUB_SHA},null,2));
 }finally{
  if(!succeeded) await page.screenshot({path:`${out}/error.png`,fullPage:true}).catch(()=>{});
+ await cdp.send('Page.stopScreencast');
+ const endTime=Date.now()/1000;
+ await Promise.all(writes);
+ const lines=[];
+ for(let i=0;i<frames.length;i++){
+  lines.push(`file '${frames[i].name}'`);
+  lines.push(`duration ${Math.max(0.02,(frames[i+1]?.time??endTime)-frames[i].time).toFixed(4)}`);
+ }
+ if(frames.length)lines.push(`file '${frames.at(-1).name}'`);
+ await fs.writeFile(`${framesDir}/frames.txt`,lines.join('\n')+'\n');
+ await fs.writeFile(`${out}/captura.json`,JSON.stringify({success:succeeded,frames:frames.length,durationSeconds:frames.length?endTime-frames[0].time:0},null,2));
  await context.close();
- const source=await page.video().path();
- await fs.rename(source,`${out}/${succeeded?'Pethub_Demostracion':'recorrido-incompleto'}.webm`);
  await browser.close();
 }
