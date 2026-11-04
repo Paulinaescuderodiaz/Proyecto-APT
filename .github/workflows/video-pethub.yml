@@ -1,0 +1,93 @@
+name: Video demostrativo de Pethub
+on:
+  push:
+    branches: [demo/video-pethub]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  grabacion:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: postgresql://pethub_demo:pethub_demo@localhost:5432/pethub_demo?schema=public
+      JWT_SECRET: solo-demo-cuentas-ficticias-entorno-efimero
+      DEMO_OUTPUT: /tmp/pethub-demo-output
+      TZ: America/Santiago
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: pethub_demo
+          POSTGRES_PASSWORD: pethub_demo
+          POSTGRES_DB: pethub_demo
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U pethub_demo -d pethub_demo"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '26'
+          cache: npm
+          cache-dependency-path: |
+            Fase 2/Evidencias Proyecto/Evidencias de sistema/Aplicación/backend/package-lock.json
+            Fase 2/Evidencias Proyecto/Evidencias de sistema/Aplicación/frontend/package-lock.json
+      - name: Preparar backend y base de demostración
+        working-directory: 'Fase 2/Evidencias Proyecto/Evidencias de sistema/Aplicación/backend'
+        run: |
+          npm ci
+          npx --no-install prisma generate
+          npx --no-install prisma migrate deploy
+          mkdir -p uploads
+      - name: Preparar frontend
+        working-directory: 'Fase 2/Evidencias Proyecto/Evidencias de sistema/Aplicación/frontend'
+        run: npm ci
+      - name: Preparar navegador de grabación
+        run: |
+          npm install --prefix .github/demo --no-save --package-lock=false playwright@1.56.1
+          .github/demo/node_modules/.bin/playwright install --with-deps chromium
+      - name: Grabar recorrido del Angular real con la API
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="$GITHUB_WORKSPACE/Fase 2/Evidencias Proyecto/Evidencias de sistema/Aplicación"
+          (cd "$base/backend" && npm start) > /tmp/pethub-backend.log 2>&1 &
+          pethub_api_pid=$!
+          (cd "$base/frontend" && npm start -- --host 127.0.0.1 --port 4200) > /tmp/pethub-frontend.log 2>&1 &
+          pethub_front_pid=$!
+          trap 'kill "$pethub_api_pid" "$pethub_front_pid" 2>/dev/null || true' EXIT
+          for intento in $(seq 1 60); do
+            if curl -fsS http://localhost:3000/ >/dev/null && curl -fsS http://localhost:4200/ >/dev/null; then break; fi
+            sleep 2
+          done
+          curl -fsS http://localhost:3000/ >/dev/null
+          curl -fsS http://localhost:4200/ >/dev/null
+          node .github/demo/record.mjs
+      - name: Crear MP4 compatible con celulares
+        run: |
+          if ! command -v ffmpeg >/dev/null; then sudo apt-get update && sudo apt-get install -y ffmpeg; fi
+          ffmpeg -y -i /tmp/pethub-demo-output/Pethub_Demostracion.webm -c:v libx264 -preset medium -crf 22 -pix_fmt yuv420p -movflags +faststart -an /tmp/pethub-demo-output/Pethub_Demostracion.mp4
+      - name: Guardar video y resultado
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Pethub-video-demostrativo
+          path: /tmp/pethub-demo-output/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Guardar diagnóstico si falla
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostico-grabacion
+          path: |
+            /tmp/pethub-backend.log
+            /tmp/pethub-frontend.log
+          if-no-files-found: ignore
+          retention-days: 3
