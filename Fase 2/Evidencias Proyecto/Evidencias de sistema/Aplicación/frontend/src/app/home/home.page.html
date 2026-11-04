@@ -144,41 +144,10 @@
           </p>
         }
 
-        <div class="lista-mascotas">
-          @for (mascota of mascotas; track mascota.id) {
-            <a
-              class="tarjeta-mascota"
-              routerLink="/mascotas"
-              [queryParams]="{ mascotaId: mascota.id }"
-              [attr.aria-label]="'Ver ficha de ' + mascota.nombre"
-            >
-              <div class="foto-mascota">
-                @if (mascota.foto) {
-                  <img
-                    [src]="mascota.foto"
-                    [alt]="'Foto de ' + mascota.nombre"
-                    (error)="ocultarFotoConError(mascota)"
-                  />
-                } @else {
-                  <ion-icon
-                    name="paw-outline"
-                    aria-hidden="true"
-                  ></ion-icon>
-                }
-              </div>
-
-              <div class="datos-mascota">
-                <h3>{{ mascota.nombre }}</h3>
-                <p>{{ mascota.raza || mascota.especie }}</p>
-              </div>
-            </a>
-          }
-
-          <a class="tarjeta-agregar" routerLink="/mascotas">
-            <ion-icon name="add-outline" aria-hidden="true"></ion-icon>
-            <span>Gestionar mascotas</span>
-          </a>
-        </div>
+        <app-lista-mascotas-inicio
+          [mascotas]="mascotas"
+          (fotoFallida)="ocultarFotoConError($event)"
+        />
       }
     </section>
 
@@ -206,30 +175,5 @@
 </ion-content>
 
 <ion-footer class="ion-no-border">
-  <nav class="menu-inferior" aria-label="Navegación principal">
-    <a routerLink="/home" class="activo" aria-current="page">
-      <ion-icon name="home-outline" aria-hidden="true"></ion-icon>
-      <span>Inicio</span>
-    </a>
-
-    <a routerLink="/mascotas">
-      <ion-icon name="paw-outline" aria-hidden="true"></ion-icon>
-      <span>Mascotas</span>
-    </a>
-
-    <a routerLink="/buscar-donantes">
-      <ion-icon name="water-outline" aria-hidden="true"></ion-icon>
-      <span>Donantes</span>
-    </a>
-
-    <button type="button" disabled aria-label="Comunidad, próximamente">
-      <ion-icon name="people-outline" aria-hidden="true"></ion-icon>
-      <span>Comunidad</span>
-    </button>
-
-    <a routerLink="/perfil">
-      <ion-icon name="person-outline" aria-hidden="true"></ion-icon>
-      <span>Perfil</span>
-    </a>
-  </nav>
+  <app-menu-inicio />
 </ion-footer>

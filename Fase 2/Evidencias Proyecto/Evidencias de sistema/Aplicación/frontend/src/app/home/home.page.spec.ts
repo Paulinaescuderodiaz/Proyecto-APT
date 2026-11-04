@@ -12,6 +12,7 @@ import {
   describe,
   expect,
   it,
+  vi,
 } from 'vitest';
 
 import { HomePage } from './home.page';
@@ -111,6 +112,33 @@ describe('HomePage — recordatorios S2-HU07', () => {
 
   it('crea la pantalla de inicio', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('mantiene el enlace a la ficha y reemplaza una foto que no carga', () => {
+    vi.spyOn(TestBed.inject(MascotaService), 'listar').mockReturnValue(of([
+      { id: 7, nombre: 'Kuro', especie: 'Gato', raza: null, usuarioId: 1,
+        createdAt: '2026-11-03T00:00:00.000Z', foto: 'http://localhost:3000/uploads/no-existe.png' },
+    ]));
+    abrirInicio();
+    httpMock.expectOne(apiUrl).flush([]);
+    fixture.detectChanges();
+    const tarjeta: HTMLAnchorElement = fixture.nativeElement.querySelector('a.tarjeta-mascota');
+    expect(tarjeta.getAttribute('href')).toBe('/mascotas?mascotaId=7');
+    expect(tarjeta.getAttribute('aria-label')).toBe('Ver ficha de Kuro');
+    tarjeta.querySelector('img')!.dispatchEvent(new Event('error'));
+    fixture.detectChanges();
+    expect(tarjeta.querySelector('img')).toBeNull();
+    expect(tarjeta.querySelector('ion-icon[name="paw-outline"]')).not.toBeNull();
+    expect(component.mascotas[0].foto).toBeNull();
+  });
+
+  it('conserva la navegación inferior y el acceso a conversaciones', () => {
+    const nav: HTMLElement = fixture.nativeElement.querySelector('nav[aria-label="Navegación principal"]');
+    expect(Array.from(nav.querySelectorAll('a')).map(a => a.getAttribute('href')))
+      .toEqual(['/home', '/mascotas', '/buscar-donantes', '/perfil']);
+    expect(nav.querySelector('a[aria-current="page"]')?.textContent).toContain('Inicio');
+    expect(fixture.nativeElement.querySelector('a[aria-label="Mis conversaciones"]').getAttribute('href'))
+      .toBe('/conversaciones');
   });
 
   it('consulta con el token y muestra vacuna, mascota, fecha y enlace', () => {
