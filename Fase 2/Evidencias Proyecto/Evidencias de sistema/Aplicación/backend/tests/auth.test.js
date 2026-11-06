@@ -17,10 +17,13 @@ describe("Autenticación - Sprint 1 (S1-HU01 y S1-HU02)", () => {
       nombre: "Usuario de Prueba",
       email: emailPrueba,
       password: passwordPrueba,
+      comuna: " Viña del Mar ",
     });
 
     expect(res.status).toBe(201);
     expect(res.body.email).toBe(emailPrueba);
+    const guardado = await prisma.usuario.findUnique({ where: { email: emailPrueba } });
+    expect(guardado.comuna).toBe("Viña del Mar");
     expect(res.body.password).toBeUndefined(); // la contraseña (hash) nunca debe salir en la respuesta
   });
 
@@ -39,6 +42,14 @@ describe("Autenticación - Sprint 1 (S1-HU01 y S1-HU02)", () => {
       .post("/api/auth/registro")
       .send({ email: "incompleto@pethub.cl" });
 
+    expect(res.status).toBe(400);
+  });
+
+  test("POST /api/auth/registro rechaza una comuna con tipo inválido", async () => {
+    const res = await request(app).post("/api/auth/registro").send({
+      nombre: "Prueba", email: "comuna.invalida@example.com", password: passwordPrueba,
+      comuna: { nombre: "Viña del Mar" },
+    });
     expect(res.status).toBe(400);
   });
 
