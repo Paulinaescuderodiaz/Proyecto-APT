@@ -13,7 +13,7 @@ async function verificarMascotaDelUsuario(mascotaId, usuarioId) {
 async function crearVacuna(req, res) {
   try {
     const usuarioId = req.usuario.id; // viene del token (lo pone verificarToken)
-    const { mascotaId, nombre, fechaAplicacion, fechaProximoRefuerzo } = req.body;
+    const { mascotaId, nombre, fechaAplicacion, fechaProximoRefuerzo, notas } = req.body;
 
     // Validamos que lleguen los 3 datos obligatorios antes de tocar la base de datos
     if (!mascotaId || !nombre || !fechaAplicacion) {
@@ -26,6 +26,11 @@ async function crearVacuna(req, res) {
     const mascota = await verificarMascotaDelUsuario(Number(mascotaId), usuarioId);
     if (!mascota) {
       return res.status(404).json({ error: "Mascota no encontrada" });
+    }
+
+    // S5: las notas son opcionales, pero si vienen deben ser texto y no muy largas
+    if (notas != null && (typeof notas !== "string" || notas.length > 500)) {
+      return res.status(400).json({ error: "Las notas deben ser texto de hasta 500 caracteres" });
     }
 
     // Convertimos los textos de fecha (ej: "2026-09-20") a objetos Date de JavaScript,
@@ -50,6 +55,7 @@ async function crearVacuna(req, res) {
         nombre,
         fechaAplicacion: fechaAplicacionDate,
         fechaProximoRefuerzo: fechaProximoRefuerzoDate,
+        notas: notas?.trim() || null, // opcional: si viene vacío queda como "sin notas"
         mascotaId: Number(mascotaId),
       },
     });
@@ -94,7 +100,7 @@ async function actualizarVacuna(req, res) {
   try {
     const usuarioId = req.usuario.id;
     const vacunaId = Number(req.params.id); // el id de la vacuna a editar, viene de la URL
-    const { nombre, fechaAplicacion, fechaProximoRefuerzo, aplicada } = req.body;
+    const { nombre, fechaAplicacion, fechaProximoRefuerzo, aplicada, notas } = req.body;
 
     // Buscamos la vacuna Y de paso traemos su mascota (con "include"),
     // para poder revisar de quién es sin hacer una segunda consulta aparte
@@ -106,6 +112,11 @@ async function actualizarVacuna(req, res) {
     // Seguridad: si la vacuna no existe, o su mascota no es del usuario logueado, se rechaza
     if (!existente || existente.mascota.usuarioId !== usuarioId) {
       return res.status(404).json({ error: "Vacuna no encontrada" });
+    }
+
+    // S5: validar las notas (si vienen)
+    if (notas != null && (typeof notas !== "string" || notas.length > 500)) {
+      return res.status(400).json({ error: "Las notas deben ser texto de hasta 500 caracteres" });
     }
 
     // Si el usuario no manda una fecha de aplicación nueva, dejamos la que ya tenía guardada
@@ -135,6 +146,8 @@ async function actualizarVacuna(req, res) {
         fechaAplicacion: nuevaFechaAplicacion,
         fechaProximoRefuerzo: nuevaFechaProximoRefuerzo,
         aplicada: aplicada ?? existente.aplicada,
+        // undefined = no cambiar; "" o null = borrar las notas
+        notas: notas === undefined ? existente.notas : (notas?.trim() || null),
       },
     });
 

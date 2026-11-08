@@ -55,6 +55,7 @@ model Vacuna {
   fechaAplicacion       DateTime
   fechaProximoRefuerzo  DateTime? // opcional: no todas las vacunas requieren refuerzo
   aplicada              Boolean   @default(false) // empieza en falso; se usará en HU07 (recordatorios)
+  notas                 String?   // observaciones opcionales (ej: "buena tolerancia, sin reacciones")
   mascotaId             Int
   mascota               Mascota   @relation(fields: [mascotaId], references: [id])
   createdAt             DateTime  @default(now())
