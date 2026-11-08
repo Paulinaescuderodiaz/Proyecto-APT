@@ -53,7 +53,7 @@ import { Documento, DocumentoService } from '../services/documento.service';
       @if (mensajeExito) {
         <p class="exito" role="status">{{ mensajeExito }}</p>
       }
-      <h5>Archivos adjuntos</h5>
+      <h5 class="titulo-adjuntos">Archivos adjuntos</h5>
       @if (cargandoDocumentos) {
         <p role="status">Cargando documentos…</p>
       } @else if (errorListado) {
@@ -96,6 +96,7 @@ import { Documento, DocumentoService } from '../services/documento.service';
     </section>
   `,
   styles: [`
+    .titulo-adjuntos { margin-top: 24px; }
     .documentos { list-style: none; padding: 0; }
     .documentos li { padding: 12px 0; border-bottom: 1px solid #e4ded8; }
     .archivo-nombre { display: block; overflow-wrap: anywhere; color: #263c3f; }

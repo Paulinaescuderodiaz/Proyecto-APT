@@ -55,7 +55,10 @@ try {
   await page.keyboard.press('Escape'); await visor.waitFor({ state: 'hidden' });
   await adjuntos.getByRole('button', { name: 'Ver Examen_Luna.pdf', exact: true }).click(); await visor.waitFor();
   assert.match(await visor.locator('iframe').getAttribute('src'), /^blob:/);
+  // El visor nativo necesita terminar de pintar después de crear el iframe.
+  await page.waitForTimeout(2500);
   await page.screenshot({ path: `${out}/vista-pdf.png` });
+  await fs.writeFile(`${out}/visor.json`, JSON.stringify(page.frames().map(frame => ({ name: frame.name(), url: frame.url() })), null, 2));
   await visor.getByRole('button', { name: 'Cerrar vista', exact: true }).click();
   await visor.waitFor({ state: 'hidden' });
   const eventoDescarga = page.waitForEvent('download');
