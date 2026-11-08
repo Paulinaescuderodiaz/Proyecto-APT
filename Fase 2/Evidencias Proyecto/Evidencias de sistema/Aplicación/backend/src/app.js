@@ -32,11 +32,8 @@ app.use(express.json({ limit: "10mb" }));
 // y lo deja disponible como req.body. El límite de 10mb evita que alguien
 // mande un body gigante que sature el servidor.
 
-app.use("/uploads", express.static("uploads"));
-// Deja la carpeta "uploads/" accesible públicamente por URL, ej:
-// http://localhost:3000/uploads/1789267200000.png
-// Así, después de subir un documento, se puede ver o descargar desde el navegador
-// o mostrarlo directamente en una imagen dentro de la app.
+// Los documentos se sirven por /api/documentos/:id/archivo, con sesión y
+// comprobación de pertenencia. La carpeta física no se publica por URL.
 
 // --- Ruta de prueba / salud del servidor ---
 app.get("/", (req, res) => {
