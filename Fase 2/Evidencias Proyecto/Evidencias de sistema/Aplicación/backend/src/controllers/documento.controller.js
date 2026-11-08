@@ -1,4 +1,6 @@
 const multer = require("multer");
+const { randomUUID } = require("crypto");
+const fs = require("fs");
 const path = require("path"); // librería nativa de Node para trabajar con rutas de archivos
 const prisma = require("../lib/prisma");
 
@@ -6,15 +8,13 @@ const prisma = require("../lib/prisma");
 const storage = multer.diskStorage({
   // dónde se guarda físicamente el archivo
   destination: (req, file, cb) => {
+    fs.mkdirSync("uploads", { recursive: true });
     cb(null, "uploads/");
   },
   // con qué nombre se guarda (no usamos el nombre original, para evitar que
   // dos archivos distintos con el mismo nombre se sobreescriban entre sí)
   filename: (req, file, cb) => {
-    const nombreUnico = Date.now() + path.extname(file.originalname);
-    // Date.now() = milisegundos actuales (siempre distinto cada vez)
-    // path.extname("foto.png") devuelve ".png" — así el archivo guardado
-    // queda, por ejemplo, "1789267200000.png"
+    const nombreUnico = randomUUID() + path.extname(file.originalname);
     cb(null, nombreUnico);
   },
 });
@@ -58,6 +58,8 @@ async function subirDocumento(req, res) {
       return res.status(500).json({ error: "Error al subir el archivo" });
     }
 
+    // Borra el archivo temporal si no se llega a asociar a un registro válido.
+    let guardado = false;
     try {
       const usuarioId = req.usuario.id;
       const { registroMedicoId } = req.body;
@@ -65,7 +67,7 @@ async function subirDocumento(req, res) {
       if (!req.file) {
         return res.status(400).json({ error: "No se recibió ningún archivo" });
       }
-      if (!registroMedicoId) {
+      if (!Number.isSafeInteger(Number(registroMedicoId)) || Number(registroMedicoId) <= 0 || Number(registroMedicoId) > 2147483647) {
         return res.status(400).json({ error: "Falta indicar el registro médico" });
       }
 
@@ -91,12 +93,89 @@ async function subirDocumento(req, res) {
         },
       });
 
-      res.status(201).json(documento);
+      guardado = true;
+      res.status(201).json(datosPublicos(documento));
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Error al guardar el documento" });
+    } finally {
+      if (!guardado && req.file) {
+        await fs.promises.unlink(req.file.path).catch(() => {});
+      }
     }
   });
 }
 
-module.exports = { subirDocumento };
+// No expone la ruta física del servidor a la interfaz.
+const seleccionPublica = {
+  id: true, nombreArchivo: true, tipoArchivo: true, tamano: true,
+  registroMedicoId: true, createdAt: true,
+};
+function datosPublicos(documento) {
+  return Object.fromEntries(Object.keys(seleccionPublica).map(campo => [campo, documento[campo]]));
+}
+function idValido(valor) {
+  return /^\d+$/.test(valor) && Number.isSafeInteger(Number(valor)) && Number(valor) > 0 && Number(valor) <= 2147483647;
+}
+
+// Lista los adjuntos de un registro propio, incluidos los guardados anteriormente.
+async function listarDocumentos(req, res) {
+  if (!idValido(req.params.registroMedicoId)) {
+    return res.status(400).json({ error: "Registro médico inválido" });
+  }
+  try {
+    const registroMedicoId = Number(req.params.registroMedicoId);
+    const registro = await prisma.registroMedico.findFirst({
+      where: { id: registroMedicoId, mascota: { usuarioId: req.usuario.id } },
+      select: { id: true },
+    });
+    if (!registro) return res.status(404).json({ error: "Registro médico no encontrado" });
+    const documentos = await prisma.documento.findMany({
+      where: { registroMedicoId }, select: seleccionPublica,
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    });
+    res.set("Cache-Control", "private, no-store");
+    res.json(documentos);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al consultar los documentos" });
+  }
+}
+
+// La URL exige sesión y pertenencia; conocer un id o nombre de archivo no basta.
+async function obtenerArchivo(req, res) {
+  if (!idValido(req.params.id)) return res.status(400).json({ error: "Documento inválido" });
+  try {
+    const documento = await prisma.documento.findFirst({
+      where: { id: Number(req.params.id), registroMedico: { mascota: { usuarioId: req.usuario.id } } },
+    });
+    if (!documento) return res.status(404).json({ error: "Documento no encontrado" });
+    const raiz = path.resolve("uploads");
+    const archivo = path.resolve(documento.rutaArchivo);
+    if (!archivo.startsWith(raiz + path.sep) || !TIPOS_PERMITIDOS.includes(documento.tipoArchivo)) {
+      return res.status(404).json({ error: "Archivo no disponible" });
+    }
+    // También evita seguir enlaces simbólicos fuera del directorio de adjuntos.
+    const real = await fs.promises.realpath(archivo);
+    const raizReal = await fs.promises.realpath(raiz);
+    if (!real.startsWith(raizReal + path.sep)) return res.status(404).json({ error: "Archivo no disponible" });
+    res.set({ "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff" });
+    res.type(documento.tipoArchivo);
+    const finalizar = error => {
+      if (!error || res.headersSent) return;
+      res.status(error.code === "ENOENT" || error.status === 404 ? 404 : 500)
+        .json({ error: "No se pudo abrir el archivo" });
+    };
+    if (req.query.descargar === "1") {
+      return res.download(real, documento.nombreArchivo, finalizar);
+    }
+    res.set("Content-Disposition", "inline");
+    res.sendFile(real, finalizar);
+  } catch (error) {
+    if (error.code === "ENOENT") return res.status(404).json({ error: "Archivo no disponible" });
+    console.error(error);
+    res.status(500).json({ error: "Error al obtener el archivo" });
+  }
+}
+
+module.exports = { subirDocumento, listarDocumentos, obtenerArchivo };

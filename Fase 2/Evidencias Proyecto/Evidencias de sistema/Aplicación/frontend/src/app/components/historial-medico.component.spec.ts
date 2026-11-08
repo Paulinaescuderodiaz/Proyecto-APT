@@ -52,6 +52,8 @@ describe('HistorialMedicoComponent — HU05', () => {
 
   afterEach(() => {
     // Detecta solicitudes inesperadas o pendientes de responder.
+    // Los registros creados instancian su consulta de adjuntos (probada en su componente).
+    for (const req of httpMock.match(r => r.method === 'GET' && /\/documentos\/registro\/\d+$/.test(r.url))) req.flush([]);
     httpMock.verify();
   });
 

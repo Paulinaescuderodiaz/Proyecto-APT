@@ -184,10 +184,24 @@ Base local: `http://localhost:3000`.
 | POST | `/api/registros-medicos` | Crear un registro médico |
 | GET | `/api/registros-medicos/mascota/:mascotaId` | Consultar historial |
 | POST | `/api/documentos` | Subir un documento |
+| GET | `/api/documentos/registro/:registroMedicoId` | Listar adjuntos de un registro propio |
+| GET | `/api/documentos/:id/archivo` | Abrir un archivo propio |
+| GET | `/api/documentos/:id/archivo?descargar=1` | Descargar conservando el nombre original |
 
 Las rutas de mascotas, vacunas, registros médicos y documentos requieren la cabecera `Authorization: Bearer <token>`. La carga de documentos utiliza `multipart/form-data`, con los campos `archivo` y `registroMedicoId`.
 
-Actualmente los archivos de `uploads` se sirven públicamente en `/uploads`; debe revisarse su control de acceso antes de utilizar documentos sensibles.
+Los archivos de `uploads` se entregan únicamente por las rutas autenticadas de documentos, que verifican la pertenencia de la mascota. La antigua ruta pública `/uploads` devuelve 404. Los archivos ya existentes se conservan y no se necesitan nuevas migraciones.
+
+### Consultar exámenes desde el historial
+
+1. Inicia sesión y abre **Mascotas → Ver ficha → Historial médico**.
+2. Crea o abre un registro médico y adjunta un PDF, JPG o PNG de hasta 5 MB.
+3. En **Archivos adjuntos** deben aparecer su nombre, tipo y tamaño. Recarga para comprobar que permanece en la lista.
+4. Pulsa **Ver** para abrir la vista previa; ciérrala con **Cerrar vista** o Escape. Si el navegador no muestra el PDF, utiliza **Descargar**.
+5. Pulsa **Descargar** y comprueba el nombre y el contenido del archivo guardado.
+6. Otra cuenta no debe poder consultar el listado ni abrir o descargar esos archivos.
+
+La prueba automatizada de Chrome está en `.github/tests/documentos.mjs` y se ejecuta con el workflow **Documentos — recorrido de navegador**. Usa exclusivamente datos ficticios y PostgreSQL efímero.
 
 ## Sesión
 
