@@ -2,6 +2,7 @@ const prisma = require("../lib/prisma");
 
 // S4-HU11: listar las notificaciones del usuario logueado (las más recientes primero).
 // Opcional: /api/notificaciones?leida=false para ver solo las que aún no leyó.
+// S5: también se puede filtrar por tipo de aviso, ej: ?tipo=solicitud_compatible (se pueden combinar).
 async function listarMisNotificaciones(req, res) {
   try {
     const usuarioId = req.usuario.id; // viene del token: solo ve las suyas
@@ -10,6 +11,12 @@ async function listarMisNotificaciones(req, res) {
     if (req.query.leida !== undefined) {
       // Los query params llegan como texto, así que comparamos con "true"
       filtro.leida = String(req.query.leida).trim().toLowerCase() === "true";
+    }
+
+    // S5: filtrar por tipo de aviso (las pestañas "Todas / Vacunas / Citas" de la maqueta).
+    // Si viene vacío, se ignora; si no coincide con ninguno, la lista sale vacía.
+    if (typeof req.query.tipo === "string" && req.query.tipo.trim()) {
+      filtro.tipo = req.query.tipo.trim().toLowerCase();
     }
 
     const notificaciones = await prisma.notificacion.findMany({
