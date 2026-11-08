@@ -5,7 +5,7 @@ const prisma = require("../lib/prisma"); // conexión a la base de datos
 // Crea una cuenta de usuario nueva (S1-HU01)
 async function registro(req, res) {
   try {
-    const { nombre, email, password, comuna } = req.body;
+   const { nombre, email, password, comuna, telefono } = req.body;
 
     // Escenario: si falta cualquiera de los 3 datos, no seguimos
     if (!nombre || !email || !password) {
@@ -14,6 +14,10 @@ async function registro(req, res) {
 
     if (comuna != null && typeof comuna !== "string") {
       return res.status(400).json({ error: "La comuna debe ser un texto" });
+    }
+
+    if (telefono != null && typeof telefono !== "string") {
+      return res.status(400).json({ error: "El teléfono debe ser un texto" });
     }
 
     // Escenario "Correo ya registrado": buscamos si ya existe una cuenta con ese email
@@ -30,15 +34,24 @@ async function registro(req, res) {
 
     // Recién ahora se crea el usuario en la base de datos, guardando el hash, no la contraseña real
     const usuario = await prisma.usuario.create({
-      data: { nombre, email, password: passwordHash, comuna: comuna?.trim() || null },
+        data: {
+        nombre,
+        email,
+        password: passwordHash,
+        comuna: comuna?.trim() || null,
+        telefono: telefono?.trim() || null, // opcional: si viene vacío queda como "no indicado"
+      },
     });
 
     // Se responde SIN el password (ni siquiera el hash) — nunca debe salir del backend
-    res.status(201).json({
+        res.status(201).json({
       id: usuario.id,
       nombre: usuario.nombre,
       email: usuario.email,
+      comuna: usuario.comuna,
+      telefono: usuario.telefono,
     });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error al crear la cuenta" });
@@ -89,4 +102,48 @@ async function login(req, res) {
   }
 }
 
-module.exports = { registro, login }; // así se pueden usar estas funciones desde auth.routes.js
+
+// S5: ver mis propios datos (perfil). Nunca devuelve la contraseña.
+async function verPerfil(req, res) {
+  try {
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: req.usuario.id }, // el id viene del token
+      select: { id: true, nombre: true, email: true, telefono: true, comuna: true },
+    });
+    if (!usuario) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+    res.json(usuario);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al obtener el perfil" });
+  }
+}
+
+// S5: editar mis datos. El correo y la contraseña no se cambian desde aquí.
+async function actualizarPerfil(req, res) {
+  try {
+    const { nombre, telefono, comuna } = req.body;
+
+    // Si mandan el nombre, no puede quedar vacío
+    if (nombre !== undefined && !String(nombre).trim()) {
+      return res.status(400).json({ error: "El nombre no puede estar vacío" });
+    }
+
+    const usuario = await prisma.usuario.update({
+      where: { id: req.usuario.id },
+      data: {
+        // undefined = "no cambiar este dato"; "" = borrarlo (queda como no indicado)
+        nombre: nombre !== undefined ? String(nombre).trim() : undefined,
+        telefono: telefono !== undefined ? (String(telefono).trim() || null) : undefined,
+        comuna: comuna !== undefined ? (String(comuna).trim() || null) : undefined,
+      },
+      select: { id: true, nombre: true, email: true, telefono: true, comuna: true },
+    });
+    res.json(usuario);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al actualizar el perfil" });
+  }
+}
+module.exports = { registro, login, verPerfil, actualizarPerfil };
