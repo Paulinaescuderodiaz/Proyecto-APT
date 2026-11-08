@@ -5,11 +5,15 @@ const prisma = require("../lib/prisma"); // conexión a la base de datos
 // Crea una cuenta de usuario nueva (S1-HU01)
 async function registro(req, res) {
   try {
-    const { nombre, email, password } = req.body;
+    const { nombre, email, password, comuna } = req.body;
 
     // Escenario: si falta cualquiera de los 3 datos, no seguimos
     if (!nombre || !email || !password) {
       return res.status(400).json({ error: "Faltan datos: nombre, email y password son obligatorios" });
+    }
+
+    if (comuna != null && typeof comuna !== "string") {
+      return res.status(400).json({ error: "La comuna debe ser un texto" });
     }
 
     // Escenario "Correo ya registrado": buscamos si ya existe una cuenta con ese email
@@ -26,7 +30,7 @@ async function registro(req, res) {
 
     // Recién ahora se crea el usuario en la base de datos, guardando el hash, no la contraseña real
     const usuario = await prisma.usuario.create({
-      data: { nombre, email, password: passwordHash },
+      data: { nombre, email, password: passwordHash, comuna: comuna?.trim() || null },
     });
 
     // Se responde SIN el password (ni siquiera el hash) — nunca debe salir del backend

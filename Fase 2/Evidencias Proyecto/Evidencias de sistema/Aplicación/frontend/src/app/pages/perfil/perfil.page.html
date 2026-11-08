@@ -15,12 +15,12 @@
       <dl>
         <div>
           <dt>Nombre</dt>
-          <dd>{{ nombre || 'Sin información' }}</dd>
+          <dd>{{ nombre() || 'Sin información' }}</dd>
         </div>
 
         <div>
           <dt>Correo electrónico</dt>
-          <dd>{{ correo || 'Sin información' }}</dd>
+          <dd>{{ correo() || 'Sin información' }}</dd>
         </div>
       </dl>
     </section>

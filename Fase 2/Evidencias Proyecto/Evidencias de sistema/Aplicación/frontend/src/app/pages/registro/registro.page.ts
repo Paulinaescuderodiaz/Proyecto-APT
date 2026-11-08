@@ -26,11 +26,11 @@ export class RegistroPage {
 
   // Comunas incluidas en el prototipo.
   comunas = [
-    "Valparaiso",
-    "Vina del Mar",
-    "Quilpue",
+    "Valparaíso",
+    "Viña del Mar",
+    "Quilpué",
     "Villa Alemana",
-    "Concon",
+    "Concón",
     "Casablanca",
   ];
 
