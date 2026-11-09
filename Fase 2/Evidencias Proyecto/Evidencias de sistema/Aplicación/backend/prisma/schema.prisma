@@ -68,6 +68,9 @@ model RegistroMedico {
   diagnostico  String    // obligatorio: sin esto no se puede guardar (escenario 2 de HU05)
   fecha        DateTime  // necesaria para poder ordenar el historial (escenario 3 de HU05)
   tratamiento  String?   // opcional: la historia no exige que sea obligatorio
+  veterinario  String?   // S5: quién atendió la consulta (opcional)
+  motivo       String?   // S5: motivo de la visita (opcional)
+  recomendaciones String? // S5: indicaciones del profesional (opcional)
   mascotaId    Int
   mascota      Mascota   @relation(fields: [mascotaId], references: [id])
   createdAt    DateTime  @default(now())
