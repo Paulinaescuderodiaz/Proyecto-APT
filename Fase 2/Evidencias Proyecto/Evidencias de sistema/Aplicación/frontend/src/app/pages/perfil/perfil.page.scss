@@ -1,5 +1,6 @@
 /* Fondo y colores explícitos para mantener la lectura en modo oscuro. */
 ion-content {
+  color-scheme: light;
   --background: #faf8f5;
   --color: #203536;
 }
@@ -98,7 +99,41 @@ dd {
 }
 fieldset { border: 0; padding: 0; min-width: 0; }
 label { display: block; margin: 16px 0 6px; }
-input { width: 100%; box-sizing: border-box; border: 1px solid #b9cdcd; border-radius: 8px; padding: 12px; font: inherit; }
+input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #8daaaa;
+  border-radius: 8px;
+  padding: 12px;
+  font: inherit;
+  background: #fff;
+  color: #203536;
+  caret-color: #203536;
+  color-scheme: light;
+}
+input::placeholder { color: #5b7072; opacity: 1; }
+input:focus-visible, button:focus-visible {
+  outline: 3px solid #2d6b6b;
+  outline-offset: 3px;
+}
 .acciones { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
-button { font: inherit; padding: 10px 16px; border-radius: 8px; cursor: pointer; }
+button {
+  font: inherit;
+  padding: 10px 16px;
+  border: 1px solid #2d6b6b;
+  border-radius: 8px;
+  background: #2d6b6b;
+  color: #fff;
+  cursor: pointer;
+}
+button:hover { background: #245858; }
+.acciones button[type="button"] {
+  background: #fff;
+  color: #2d6b6b;
+}
+.acciones button[type="button"]:hover { background: #eef5f5; }
 button:disabled { opacity: .6; }
+
+
+button.cerrar-sesion { border-color: #b42318; background: transparent; color: #b42318; }
+button.cerrar-sesion:hover { background: #fff0eb; }
