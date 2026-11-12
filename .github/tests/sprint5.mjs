@@ -24,7 +24,8 @@ try {
   await page.locator('#comuna').selectOption(user.comuna);
   await page.getByRole('button',{name:'Crear cuenta',exact:true}).click();
   await page.waitForURL('**/login');
-  await page.locator('#correo').fill(user.email); await page.locator('#clave').fill(user.password);
+  // Ionic conserva el registro oculto: acota los campos al login visible.
+  await page.locator('app-login #correo').fill(user.email); await page.locator('app-login #clave').fill(user.password);
   await page.getByRole('button',{name:'Iniciar sesión',exact:true}).click(); await page.waitForURL('**/home');
   const token=await page.evaluate(()=>localStorage.getItem('pethub_token'));
   await page.goto('http://localhost:4200/perfil');
@@ -74,7 +75,7 @@ try {
   await vacunas.locator('input[formcontrolname=aplicada]').check();
   await vacunas.locator('#notas-vacuna').fill('Refuerzo confirmado');
   await vacunas.getByRole('button',{name:'Guardar cambios',exact:true}).click();
-  await vacunas.getByText('Refuerzo confirmado',{exact:true}).waitFor();
+  await vacunas.getByText('Notas: Refuerzo confirmado',{exact:true}).waitFor();
   lista=await request(`/vacunas/mascota/${mascota.id}`,'GET',null,token); assert.equal(lista[0].aplicada,true);
   await page.goto('http://localhost:4200/home');
   await page.getByText('No tienes recordatorios nuevos.',{exact:true}).waitFor();
