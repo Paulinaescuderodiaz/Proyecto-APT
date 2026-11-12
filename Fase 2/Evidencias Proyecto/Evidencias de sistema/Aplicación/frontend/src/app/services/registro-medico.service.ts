@@ -7,6 +7,9 @@ import { AuthService } from './auth.service';
 export interface RegistroMedico {
   id: number;
   mascotaId: number;
+  veterinario?: string | null;
+  motivo?: string | null;
+  recomendaciones?: string | null;
   diagnostico: string;
   fecha: string;
   tratamiento: string | null;
@@ -15,6 +18,9 @@ export interface RegistroMedico {
 // Datos enviados al guardar un diagnóstico.
 export interface RegistroMedicoData {
   mascotaId: number;
+  veterinario?: string | null;
+  motivo?: string | null;
+  recomendaciones?: string | null;
   diagnostico: string;
   fecha: string;
   tratamiento: string;
@@ -41,6 +47,10 @@ export class RegistroMedicoService {
       `${this.apiUrl}/mascota/${mascotaId}`,
       { headers: this.headers() }
     );
+  }
+
+  obtener(id: number): Observable<RegistroMedico> {
+    return this.http.get<RegistroMedico>(`${this.apiUrl}/${id}`, { headers: this.headers() });
   }
 
   crear(datos: RegistroMedicoData): Observable<RegistroMedico> {

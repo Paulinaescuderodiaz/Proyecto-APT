@@ -190,4 +190,16 @@ describe('NotificacionesPage — S4-HU11', () => {
     fixture.detectChanges();
     expect(texto()).toContain('No tienes notificaciones todavía.');
   });
+  it('envía el filtro por tipo y conserva el filtro de no leídas', () => {
+    cargar(); page.filtrar(true);
+    const selector = fixture.nativeElement.querySelector('#tipo-notificacion') as HTMLSelectElement;
+    selector.value = 'recordatorio_vacuna'; selector.dispatchEvent(new Event('change'));
+    const req = http.expectOne(`${url}?tipo=recordatorio_vacuna`);
+    expect(req.request.headers.get('Authorization')).toBe('Bearer token-prueba');
+    req.flush([{ ...aviso, tipo: 'recordatorio_vacuna' }, { ...aviso, id: 8, leida: true }]);
+    fixture.detectChanges(); expect(tarjetas()).toHaveLength(1); expect(page.soloNoLeidas).toBe(true);
+    selector.value = ''; selector.dispatchEvent(new Event('change'));
+    http.expectOne(url).flush([]);
+  });
+
 });

@@ -16,6 +16,7 @@ export class NotificacionesPage implements OnDestroy {
   notificaciones: Notificacion[] = [];
   cargando = true;
   soloNoLeidas = false;
+  tipo = '';
   errorCarga = '';
   errorMarcado = '';
   mensaje = '';
@@ -32,6 +33,7 @@ export class NotificacionesPage implements OnDestroy {
   // Ionic conserva las páginas: actualiza los datos al entrar, incluso tras cambiar de cuenta.
   ionViewWillEnter(): void {
     this.soloNoLeidas = false;
+    this.tipo = '';
     this.cargar();
   }
 
@@ -53,7 +55,7 @@ export class NotificacionesPage implements OnDestroy {
     this.errorCarga = '';
     this.errorMarcado = '';
     this.mensaje = '';
-    this.consulta = this.servicio.listar().subscribe({
+    this.consulta = this.servicio.listar(this.tipo || undefined).subscribe({
       next: (avisos) => {
         // Conserva el orden del backend, de más reciente a más antiguo.
         this.notificaciones = avisos;
@@ -68,6 +70,8 @@ export class NotificacionesPage implements OnDestroy {
       },
     });
   }
+
+  cambiarTipo(evento: Event): void { this.tipo = (evento.target as HTMLSelectElement).value; this.cargar(); }
 
   filtrar(soloNoLeidas: boolean): void {
     this.soloNoLeidas = soloNoLeidas;

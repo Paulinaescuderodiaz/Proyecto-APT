@@ -5,6 +5,7 @@ export interface Vacuna {
   id: number;
   mascotaId: number;
   nombre: string;
+  notas?: string | null;
   fechaAplicacion: string;
   fechaProximoRefuerzo: string | null;
   aplicada: boolean;
@@ -12,6 +13,7 @@ export interface Vacuna {
 
 export interface DatosVacuna {
   nombre: string;
+  notas?: string | null;
   fechaAplicacion: string;
   fechaProximoRefuerzo: string | null;
 }

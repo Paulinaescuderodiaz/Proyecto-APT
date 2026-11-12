@@ -19,6 +19,7 @@ export class RegistroPage {
   clave = "";
   confirmacion = "";
   comuna = "";
+  telefono = "";
   mostrarClave = false;
 
   // El HTML muestra este mensaje con {{ mensaje }}.
@@ -78,6 +79,7 @@ export class RegistroPage {
         email: this.correo.trim(),
         password: this.clave,
         comuna: this.comuna,
+        ...(this.telefono.trim() ? { telefono: this.telefono.trim() } : {}),
       })
       .subscribe({
         next: () => {

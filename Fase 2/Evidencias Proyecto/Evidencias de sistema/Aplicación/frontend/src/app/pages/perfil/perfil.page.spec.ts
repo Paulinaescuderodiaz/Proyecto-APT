@@ -1,37 +1,64 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { provideRouter, Router } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { NgForm } from '@angular/forms';
+import { beforeEach, afterEach, describe, expect, it } from 'vitest';
 import { PerfilPage } from './perfil.page';
-import { AuthService } from '../../services/auth.service';
 
-describe('Perfil: datos visibles de la sesión', () => {
-  let usuario = { nombre: 'Ana Demo', email: 'ana.demo@example.com' };
+describe('Perfil: consulta y edición persistida', () => {
+  const url = 'http://localhost:3000/api/auth/perfil';
+  const ana = { id: 1, nombre: 'Ana Demo', email: 'ana.demo@example.com', telefono: null, comuna: 'Viña del Mar' };
+  let http: HttpTestingController;
   beforeEach(async () => {
-    usuario = { nombre: 'Ana Demo', email: 'ana.demo@example.com' };
-    await TestBed.configureTestingModule({
-      imports: [PerfilPage], providers: [provideRouter([]), {
-        provide: AuthService, useValue: {
-          estaAutenticado: () => true, obtenerUsuario: () => usuario, logout: () => {},
-        },
-      }],
-    }).compileComponents();
+    localStorage.setItem('pethub_token', 'token-ana');
+    await TestBed.configureTestingModule({ imports: [PerfilPage], providers: [
+      provideRouter([]), provideHttpClient(), provideHttpClientTesting(),
+    ] }).compileComponents();
+    http = TestBed.inject(HttpTestingController);
   });
-  it('muestra nombre y correo en la primera apertura', async () => {
-    const fixture = TestBed.createComponent(PerfilPage);
-    fixture.detectChanges();
-    await fixture.whenStable();
-    expect(fixture.nativeElement.textContent).toContain('Ana Demo');
-    expect(fixture.nativeElement.textContent).toContain('ana.demo@example.com');
-    expect(fixture.nativeElement.textContent).not.toContain('Sin información');
+  afterEach(() => { http.verify(); localStorage.clear(); TestBed.resetTestingModule(); });
+  function abrir() {
+    const fixture = TestBed.createComponent(PerfilPage); fixture.detectChanges();
+    const req = http.expectOne(url);
+    expect(req.request.headers.get('Authorization')).toBe('Bearer token-ana');
+    req.flush(ana); fixture.detectChanges(); return fixture;
+  }
+  it('muestra datos de la API en la primera apertura', () => {
+    const f = abrir(); expect(f.nativeElement.textContent).toContain(ana.nombre);
+    expect(f.nativeElement.textContent).toContain(ana.email);
+    expect(JSON.parse(localStorage.getItem('pethub_usuario')!).comuna).toBe('Viña del Mar');
   });
-  it('actualiza la vista al volver con otra sesión sin un clic adicional', async () => {
-    const fixture = TestBed.createComponent(PerfilPage);
-    fixture.detectChanges(); await fixture.whenStable();
-    usuario = { nombre: 'Mateo Demo', email: 'mateo.demo@example.com' };
-    fixture.componentInstance.ionViewWillEnter();
-    await fixture.whenStable();
-    expect(fixture.nativeElement.textContent).toContain('Mateo Demo');
-    expect(fixture.nativeElement.textContent).toContain('mateo.demo@example.com');
-    expect(fixture.nativeElement.textContent).not.toContain('Ana Demo');
+  it('guarda con PUT, actualiza la sesión y vuelve a consultar al entrar', async () => {
+    const f = abrir(); const c = f.componentInstance; c.editar(); f.detectChanges(); await f.whenStable();
+    c.datos = { nombre: ' Ana Editada ', telefono: ' 912345678 ', comuna: ' Quilpué ' };
+    c.guardar({ invalid: false } as NgForm);
+    const req = http.expectOne(url); expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual({ nombre: 'Ana Editada', telefono: '912345678', comuna: 'Quilpué' });
+    const editada = { ...ana, ...req.request.body }; req.flush(editada); f.detectChanges();
+    expect(c.editando()).toBe(false); expect(c.nombre()).toBe('Ana Editada');
+    expect(JSON.parse(localStorage.getItem('pethub_usuario')!).nombre).toBe('Ana Editada');
+    c.ionViewWillEnter(); http.expectOne(url).flush(editada); f.detectChanges();
+    expect(f.nativeElement.textContent).toContain('Quilpué');
+  });
+  it('conserva el formulario si falla el servidor', () => {
+    const f = abrir(); const c = f.componentInstance; c.editar(); c.datos.nombre = 'Ana nueva';
+    c.guardar({ invalid: false } as NgForm);
+    http.expectOne(url).flush({}, { status: 500, statusText: 'Error' });
+    expect(c.editando()).toBe(true); expect(c.datos.nombre).toBe('Ana nueva');
+    expect(c.error()).toContain('reintentar'); expect(c.guardando()).toBe(false);
+  });
+  it('descarta ediciones al cancelar', () => {
+    const c = abrir().componentInstance; c.editar(); c.datos.nombre = 'Descartar'; c.cancelar();
+    c.editar(); expect(c.datos.nombre).toBe(ana.nombre); http.expectNone(r => r.method === 'PUT');
+  });
+  it('no muestra el perfil anterior si la siguiente carga falla', () => {
+    const c = abrir().componentInstance; c.ionViewWillEnter();
+    http.expectOne(url).flush({}, {status: 500, statusText: 'Error'});
+    expect(c.nombre()).toBe(''); expect(c.correo()).toBe(''); expect(c.error()).toContain('cargar');
+  });
+  it('cancela solicitudes al salir para evitar respuestas de otra sesión', () => {
+    const f = TestBed.createComponent(PerfilPage); f.detectChanges();
+    const req = http.expectOne(url); f.componentInstance.ionViewWillLeave(); expect(req.cancelled).toBe(true);
   });
 });
