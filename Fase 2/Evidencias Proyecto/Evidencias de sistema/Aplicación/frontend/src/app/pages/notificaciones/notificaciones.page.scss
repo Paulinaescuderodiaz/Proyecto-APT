@@ -1,5 +1,5 @@
 :host { color: #243c38; }
-ion-content { --background: #faf8f5; }
+ion-content { --background: #faf8f5; --color: #243c38; color-scheme: light; }
 .pagina { max-width: 680px; margin: auto; padding: 24px 20px 40px; }
 h1 { margin: 24px 0 8px; font-size: 28px; }
 h1, h2 { color: #243c38; }
@@ -26,3 +26,21 @@ time { display: block; color: #526660; font-size: 14px; }
 .confirmacion { color: #236b5d; }
 .confirmacion:empty { display: none; }
 .nota, .resumen { color: #526660; font-size: 14px; }
+
+/* Evita controles oscuros sobre el fondo claro de esta página. */
+label[for='tipo-notificacion'] { display: block; margin: 16px 0 8px; }
+#tipo-notificacion {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #8daaaa;
+  border-radius: 10px;
+  background: #fff;
+  color: #243c38;
+  color-scheme: light;
+  font: inherit;
+}
+#tipo-notificacion option { background: #fff; color: #243c38; }
+#tipo-notificacion:focus-visible { outline: 3px solid #a96b00; outline-offset: 3px; }
