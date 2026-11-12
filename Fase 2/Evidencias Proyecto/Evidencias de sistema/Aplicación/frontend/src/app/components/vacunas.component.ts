@@ -93,6 +93,9 @@ function ordenFechas(
           @for (vacuna of vacunas; track vacuna.id) {
             <article class="vacuna">
               <h3>{{ vacuna.nombre }}</h3>
+              <p class="estado-refuerzo" [class.aplicado]="vacuna.aplicada">
+                {{ vacuna.aplicada ? 'Refuerzo aplicado' : vacuna.fechaProximoRefuerzo ? 'Refuerzo pendiente' : 'Sin refuerzo programado' }}
+              </p>
 
               <p>
                 Aplicación:
@@ -247,6 +250,20 @@ function ordenFechas(
     }
 
     .listado { margin-bottom: 24px; }
+
+    .estado-refuerzo {
+      display: inline-block;
+      margin: 0 0 8px;
+      padding: 6px 10px;
+      border: 1px solid #c6d5d2;
+      border-radius: 8px;
+      background: #fff;
+      color: #344d4a;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .estado-refuerzo.aplicado { background: #e3f1e9; color: #245b3b; border-color: #94bca4; }
 
     fieldset {
       border: 0;

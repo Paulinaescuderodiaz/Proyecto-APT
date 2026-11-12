@@ -267,6 +267,21 @@ describe('VacunasComponent — S2-HU04', () => {
     expect(req.request.body.aplicada).toBe(true);
     req.flush({ ...vacuna, notas: 'Control realizado', aplicada: true });
     fixture.detectChanges(); expect(fixture.nativeElement.textContent).toContain('Control realizado');
+    expect(fixture.nativeElement.querySelector('.estado-refuerzo').textContent.trim()).toBe('Refuerzo aplicado');
+  });
+  it('distingue un refuerzo pendiente de una vacuna sin refuerzo programado', () => {
+    cargarLista([vacuna, { ...vacuna, id: 11, fechaProximoRefuerzo: null }]);
+    const estados = Array.from(fixture.nativeElement.querySelectorAll('.estado-refuerzo'))
+      .map(el => (el as HTMLElement).textContent?.trim());
+    expect(estados).toEqual(['Refuerzo pendiente', 'Sin refuerzo programado']);
+  });
+  it('mantiene pendiente la tarjeta si falla el guardado de aplicada', () => {
+    cargarLista([vacuna]); componente.editar(componente.vacunas[0]);
+    componente.formulario.controls.aplicada.setValue(true); enviarFormulario();
+    httpMock.expectOne(`${url}/10`).flush({}, { status: 500, statusText: 'Error' });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.estado-refuerzo').textContent.trim()).toBe('Refuerzo pendiente');
+    expect(componente.formulario.controls.aplicada.value).toBe(true);
   });
   it('rechaza notas que exceden el límite de 500 caracteres', () => {
     cargarLista(); completarFormulario();
