@@ -9,6 +9,8 @@ export interface MascotaBackend {
   nombre: string;
   especie: string;
   raza: string | null;
+  fechaNacimiento?: string | null;
+  sexo?: string | null;
   foto: string | null;
   usuarioId: number;
   createdAt: string;
@@ -21,6 +23,8 @@ interface MascotaData {
   nombre: string;
   especie: string;
   raza?: string;
+  fechaNacimiento?: string | null;
+  sexo?: string | null;
   foto?: string;
 }
 

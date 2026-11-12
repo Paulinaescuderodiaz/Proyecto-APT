@@ -31,6 +31,7 @@ export class HistorialMedicoComponent implements OnChanges, OnDestroy {
   diagnostico = '';
   fecha = '';
   tratamiento = '';
+  veterinario = ''; motivo = ''; recomendaciones = '';
 
   cargando = false;
   guardando = false;
@@ -41,6 +42,22 @@ export class HistorialMedicoComponent implements OnChanges, OnDestroy {
 
   private consulta?: Subscription;
   private guardado?: Subscription;
+  private consultaDetalle?: Subscription;
+  detalle: RegistroMedico | null = null;
+  cargandoDetalle = false;
+  errorDetalle = '';
+
+  verDetalle(id: number): void {
+    this.consultaDetalle?.unsubscribe();
+    this.detalle = null; this.errorDetalle = ''; this.cargandoDetalle = true;
+    this.consultaDetalle = this.registroService.obtener(id).subscribe({
+      next: registro => { this.detalle = registro; this.cargandoDetalle = false; this.cdr.detectChanges(); },
+      error: () => { this.errorDetalle = 'No pudimos cargar el detalle. Intenta nuevamente.'; this.cargandoDetalle = false; this.cdr.detectChanges(); },
+    });
+  }
+  cerrarDetalle(): void {
+    this.consultaDetalle?.unsubscribe(); this.detalle = null; this.errorDetalle = ''; this.cargandoDetalle = false;
+  }
 
   constructor(
     private registroService: RegistroMedicoService,
@@ -52,10 +69,12 @@ export class HistorialMedicoComponent implements OnChanges, OnDestroy {
     this.consulta?.unsubscribe();
     this.guardado?.unsubscribe();
 
+    this.cerrarDetalle();
     this.registros = [];
     this.diagnostico = '';
     this.fecha = '';
     this.tratamiento = '';
+    this.veterinario = ''; this.motivo = ''; this.recomendaciones = '';
     this.errorGuardado = '';
     this.mensajeExito = '';
     this.enviado = false;
@@ -108,6 +127,9 @@ export class HistorialMedicoComponent implements OnChanges, OnDestroy {
       // El input entrega YYYY-MM-DD; el backend lo convierte a Date.
       fecha: this.fecha,
       tratamiento: this.tratamiento.trim(),
+      ...(this.veterinario.trim() ? { veterinario: this.veterinario.trim() } : {}),
+      ...(this.motivo.trim() ? { motivo: this.motivo.trim() } : {}),
+      ...(this.recomendaciones.trim() ? { recomendaciones: this.recomendaciones.trim() } : {}),
     }).subscribe({
       next: (registro) => {
         // Se agrega únicamente cuando el servidor confirma que fue guardado.
@@ -118,7 +140,7 @@ export class HistorialMedicoComponent implements OnChanges, OnDestroy {
         formulario.resetForm({
           diagnostico: '',
           fecha: '',
-          tratamiento: '',
+          tratamiento: '', veterinario: '', motivo: '', recomendaciones: '',
         });
 
         this.mensajeExito = 'Registro médico guardado correctamente.';
@@ -146,6 +168,7 @@ export class HistorialMedicoComponent implements OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.cerrarDetalle();
     // Evita actualizar una ficha que ya se cerró.
     this.consulta?.unsubscribe();
     this.guardado?.unsubscribe();

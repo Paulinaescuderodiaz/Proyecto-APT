@@ -13,6 +13,8 @@ interface Mascota {
   nombre: string;
   especie: string;
   raza: string;
+  fechaNacimiento?: string;
+  sexo?: string;
   foto?: string;
   donante?: Donante | null;
   aviso?: string;
@@ -41,6 +43,11 @@ export class MascotasPage implements OnInit {
   nombre = '';
   especie = '';
   raza = '';
+  fechaNacimiento = '';
+  sexo = '';
+  errorGuardado = '';
+  guardando = false;
+  hoy = new Date().toISOString().slice(0, 10);
 
   // Una selección abre la ficha de detalle; null permite mostrar el listado o el formulario.
   mascotaSeleccionada: Mascota | null = null;
@@ -81,6 +88,8 @@ export class MascotasPage implements OnInit {
           nombre: m.nombre,
           especie: m.especie,
           raza: m.raza ?? '',
+          fechaNacimiento: m.fechaNacimiento?.slice(0, 10) || '',
+          sexo: m.sexo || '',
           foto: m.foto ?? '',
           donante: m.donante ?? null,
           aviso: m.aviso,
@@ -172,6 +181,7 @@ export class MascotasPage implements OnInit {
     this.nombre = '';
     this.especie = '';
     this.raza = '';
+    this.fechaNacimiento = ''; this.sexo = ''; this.errorGuardado = '';
     this.mascotaSeleccionada = null;
     this.mostrarFormulario = true;
     this.foto = '';
@@ -180,7 +190,7 @@ export class MascotasPage implements OnInit {
 
   // El mismo envío sirve para crear o editar; espera a que termine la lectura de la foto.
   agregar(formulario: NgForm): void {
-    if (this.cargandoFoto) return;
+    if (this.cargandoFoto || this.guardando) return;
     if (
       formulario.invalid ||
       !this.nombre.trim() ||
@@ -190,12 +200,20 @@ export class MascotasPage implements OnInit {
       return;
     }
 
+    this.errorGuardado = '';
+    if (this.fechaNacimiento && (!/^\d{4}-\d{2}-\d{2}$/.test(this.fechaNacimiento) || !Number.isFinite(Date.parse(this.fechaNacimiento)) || this.fechaNacimiento > this.hoy)) {
+      this.errorGuardado = 'La fecha de nacimiento debe ser válida y no puede ser futura.'; return;
+    }
+    if (this.sexo && !['macho', 'hembra'].includes(this.sexo)) { this.errorGuardado = 'Selecciona macho o hembra.'; return; }
+    this.guardando = true;
     // Normaliza espacios del nombre y la raza antes de enviar el formulario.
     const datos = {
       nombre: this.nombre.trim(),
       especie: this.especie,
       raza: this.raza.trim(),
       foto: this.foto,
+      ...(this.editandoId !== null || this.fechaNacimiento ? { fechaNacimiento: this.fechaNacimiento || null } : {}),
+      ...(this.editandoId !== null || this.sexo ? { sexo: this.sexo || null } : {}),
     };
 
     // La edición reemplaza el elemento por id solo después de que el backend confirme el cambio.
@@ -207,6 +225,8 @@ export class MascotasPage implements OnInit {
             nombre: mascotaActualizada.nombre,
             especie: mascotaActualizada.especie,
             raza: mascotaActualizada.raza ?? '',
+            fechaNacimiento: mascotaActualizada.fechaNacimiento?.slice(0, 10) || '',
+            sexo: mascotaActualizada.sexo || '',
             foto: mascotaActualizada.foto ?? '',
             // La actualización de datos no devuelve la relación de donante.
             donante: this.mascotas.find(m => m.id === mascotaActualizada.id)?.donante,
@@ -218,11 +238,12 @@ export class MascotasPage implements OnInit {
           );
 
           this.editandoId = null;
+          this.guardando = false;
           this.mostrarFormulario = false;
           this.cdr.detectChanges();
         },
         error: (error) => {
-          console.error('Error al actualizar la mascota', error);
+          this.guardando = false; this.errorGuardado = 'No pudimos guardar la mascota. Conservamos tus datos para reintentar.'; this.cdr.markForCheck();
         },
       });
     } else {
@@ -236,14 +257,17 @@ export class MascotasPage implements OnInit {
               nombre: mascotaCreada.nombre,
               especie: mascotaCreada.especie,
               raza: mascotaCreada.raza ?? '',
+              fechaNacimiento: mascotaCreada.fechaNacimiento?.slice(0, 10) || '',
+              sexo: mascotaCreada.sexo || '',
               foto: mascotaCreada.foto ?? '',
             },
           ];
+          this.guardando = false;
           this.mostrarFormulario = false;
           this.cdr.detectChanges();
         },
         error: (error) => {
-          console.error('Error al crear la mascota', error);
+          this.guardando = false; this.errorGuardado = 'No pudimos guardar la mascota. Conservamos tus datos para reintentar.'; this.cdr.markForCheck();
         },
       });
     }
@@ -255,6 +279,7 @@ export class MascotasPage implements OnInit {
     this.nombre = mascota.nombre;
     this.especie = mascota.especie;
     this.raza = mascota.raza;
+    this.fechaNacimiento = mascota.fechaNacimiento || ''; this.sexo = mascota.sexo || ''; this.errorGuardado = '';
 
     this.mascotaSeleccionada = null;
     this.mostrarFormulario = true;

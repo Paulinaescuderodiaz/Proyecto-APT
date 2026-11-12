@@ -121,6 +121,8 @@
       </div>
 
       <div class="campo">
+        <label for="telefono">Teléfono (opcional)</label>
+        <input id="telefono" name="telefono" type="tel" autocomplete="tel" [(ngModel)]="telefono" />
         <label for="comuna">Tu comuna</label>
         <!-- Las opciones provienen del catálogo comunas definido en RegistroPage. -->
         <select id="comuna" name="comuna" [(ngModel)]="comuna" #campoComuna="ngModel" required

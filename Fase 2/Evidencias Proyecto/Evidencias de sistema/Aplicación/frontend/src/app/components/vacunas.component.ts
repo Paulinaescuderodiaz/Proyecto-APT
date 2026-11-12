@@ -108,6 +108,7 @@ function ordenFechas(
                 <p>Sin fecha de refuerzo.</p>
               }
 
+              @if (vacuna.notas) { <p class="notas">Notas: {{ vacuna.notas }}</p> }
               <button
                 type="button"
                 [disabled]="guardando"
@@ -186,6 +187,10 @@ function ordenFechas(
               </p>
             }
 
+            <label for="notas-vacuna">Notas (opcional, hasta 500 caracteres)</label>
+            <textarea id="notas-vacuna" formControlName="notas" maxlength="500" rows="3"></textarea>
+            @if (formulario.controls.notas.invalid && formulario.controls.notas.touched) { <p class="error" role="alert">Las notas admiten hasta 500 caracteres.</p> }
+            @if (editandoId !== null) { <label><input type="checkbox" formControlName="aplicada" /> Refuerzo aplicado (no requiere recordatorio)</label> }
             <div class="acciones">
               <button type="submit" class="primario">
                 {{
@@ -255,7 +260,7 @@ function ordenFechas(
       margin: 16px 0 8px;
     }
 
-    input {
+    input:not([type="checkbox"]), textarea {
       width: 100%;
       box-sizing: border-box;
       padding: 12px;
@@ -314,6 +319,8 @@ export class VacunasComponent implements OnChanges, OnDestroy {
   private envio?: Subscription;
 
   formulario = new FormGroup({
+    notas: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(500)] }),
+    aplicada: new FormControl(false, { nonNullable: true }),
     nombre: new FormControl('', {
       nonNullable: true,
       validators: [nombreValido, Validators.maxLength(100)],
@@ -382,6 +389,7 @@ export class VacunasComponent implements OnChanges, OnDestroy {
       nombre: valores.nombre.trim(),
       fechaAplicacion: valores.fechaAplicacion,
       fechaProximoRefuerzo: valores.fechaProximoRefuerzo || null,
+      ...(valores.notas.trim() || this.editandoId !== null ? { notas: valores.notas.trim() } : {}),
     };
 
     const id = this.editandoId;
@@ -389,7 +397,7 @@ export class VacunasComponent implements OnChanges, OnDestroy {
       ? this.servicio.crear(this.mascotaId, datos)
       : this.servicio.actualizar(id, {
           ...datos,
-          aplicada: this.aplicadaOriginal,
+          aplicada: valores.aplicada,
         });
 
     this.guardando = true;
@@ -430,6 +438,8 @@ export class VacunasComponent implements OnChanges, OnDestroy {
     this.exito = '';
 
     this.formulario.reset({
+      notas: vacuna.notas || '',
+      aplicada: vacuna.aplicada,
       nombre: vacuna.nombre,
       fechaAplicacion: vacuna.fechaAplicacion.slice(0, 10),
       fechaProximoRefuerzo:
@@ -443,6 +453,8 @@ export class VacunasComponent implements OnChanges, OnDestroy {
     this.errorGuardado = '';
     this.exito = '';
     this.formulario.reset({
+      notas: '',
+      aplicada: false,
       nombre: '',
       fechaAplicacion: '',
       fechaProximoRefuerzo: '',

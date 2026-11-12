@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
+import { NgForm } from '@angular/forms';
+import { vi } from 'vitest';
 import { By } from '@angular/platform-browser';
 import { provideHttpClient } from '@angular/common/http';
 import { DonanteComponent } from '../../components/donante.component';
@@ -69,4 +71,19 @@ describe('MascotasPage', () => {
   it('crea la pantalla de mascotas', () => {
     expect(component).toBeTruthy();
   });
+  it('rechaza una fecha futura sin enviar una petición', () => {
+    const servicio = TestBed.inject(MascotaService); servicio.crear = vi.fn();
+    component.abrirFormulario(); component.nombre = 'Luna'; component.especie = 'Gato'; component.fechaNacimiento = '2999-01-01';
+    component.agregar({invalid:false} as NgForm);
+    expect(servicio.crear).not.toHaveBeenCalled(); expect(component.errorGuardado).toContain('futura');
+  });
+  it('envía nacimiento y sexo en el alta y utiliza la respuesta confirmada', () => {
+    const servicio = TestBed.inject(MascotaService);
+    servicio.crear = vi.fn().mockReturnValue(of({id:8,nombre:'Luna',especie:'Gato',raza:null,foto:null,usuarioId:1,createdAt:'2026-11-12',fechaNacimiento:'2023-03-10T00:00:00Z',sexo:'hembra'}));
+    component.abrirFormulario(); component.nombre = 'Luna'; component.especie = 'Gato';
+    component.fechaNacimiento = '2023-03-10'; component.sexo = 'hembra'; component.agregar({invalid:false} as NgForm);
+    expect(servicio.crear).toHaveBeenCalledWith({nombre:'Luna',especie:'Gato',raza:'',foto:'',fechaNacimiento:'2023-03-10',sexo:'hembra'});
+    expect(component.mascotas[0].fechaNacimiento).toBe('2023-03-10'); expect(component.mascotas[0].sexo).toBe('hembra');
+  });
+
 });

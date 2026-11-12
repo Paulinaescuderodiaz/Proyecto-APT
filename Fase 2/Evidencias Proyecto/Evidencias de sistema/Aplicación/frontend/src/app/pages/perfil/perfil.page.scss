@@ -96,3 +96,9 @@ dd {
   outline: 3px solid #2d6b6b;
   outline-offset: 4px;
 }
+fieldset { border: 0; padding: 0; min-width: 0; }
+label { display: block; margin: 16px 0 6px; }
+input { width: 100%; box-sizing: border-box; border: 1px solid #b9cdcd; border-radius: 8px; padding: 12px; font: inherit; }
+.acciones { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+button { font: inherit; padding: 10px 16px; border-radius: 8px; cursor: pointer; }
+button:disabled { opacity: .6; }

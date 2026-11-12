@@ -289,4 +289,29 @@ describe('HistorialMedicoComponent — HU05', () => {
 
     expect(fixture.nativeElement.querySelector('.exito')).toBeNull();
   });
+  it('envía los campos de consulta y abre su detalle autenticado', async () => {
+    await cargarHistorial();
+    await escribir('#diagnostico', 'Control sano'); await escribir('#fecha-registro', '2026-11-10');
+    await escribir('#veterinario', ' Dra. Pérez '); await escribir('#motivo', 'Control preventivo');
+    await escribir('#recomendaciones', 'Mantener controles'); await enviarFormulario();
+    const req = httpMock.expectOne(apiUrl);
+    expect(req.request.body.veterinario).toBe('Dra. Pérez');
+    expect(req.request.body.motivo).toBe('Control preventivo');
+    expect(req.request.body.recomendaciones).toBe('Mantener controles');
+    const registro = { ...req.request.body, id: 9, documentos: [] }; req.flush(registro);
+    fixture.detectChanges(); fixture.componentInstance.verDetalle(9);
+    const detalle = httpMock.expectOne(`${apiUrl}/9`);
+    expect(detalle.request.headers.get('Authorization')).toBe('Bearer token-de-prueba');
+    detalle.flush(registro); fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('[aria-label="Detalle de consulta"]').textContent).toContain('Dra. Pérez');
+    fixture.componentInstance.cerrarDetalle(); expect(fixture.componentInstance.detalle).toBeNull();
+  });
+  it('limpia el detalle y cancela su carga al cambiar de mascota', async () => {
+    await cargarHistorial(); fixture.componentInstance.verDetalle(9);
+    const req = httpMock.expectOne(`${apiUrl}/9`);
+    fixture.componentRef.setInput('mascotaId', 2); fixture.detectChanges();
+    expect(req.cancelled).toBe(true); expect(fixture.componentInstance.detalle).toBeNull();
+    httpMock.expectOne(`${apiUrl}/mascota/2`).flush([]);
+  });
+
 });

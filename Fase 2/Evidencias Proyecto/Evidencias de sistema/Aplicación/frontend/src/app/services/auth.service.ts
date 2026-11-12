@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable, tap } from "rxjs";
 
 // Contrato del registro enviado por la pantalla: incluye la comuna seleccionada.
@@ -8,6 +8,7 @@ interface RegistroData {
   email: string;
   password: string;
   comuna: string;
+  telefono?: string;
 }
 
 interface LoginData {
@@ -15,10 +16,14 @@ interface LoginData {
   password: string;
 }
 
+export interface PerfilUsuario {
+  id: number; nombre: string; email: string; telefono?: string | null; comuna?: string | null;
+}
+
 // Respuesta esperada del login: token de sesión y datos públicos del usuario.
 interface LoginResponse {
   token: string;
-  usuario: { id: number; nombre: string; email: string };
+  usuario: PerfilUsuario;
 }
 
 @Injectable({ providedIn: "root" })
@@ -42,6 +47,23 @@ export class AuthService {
         localStorage.setItem("pethub_usuario", JSON.stringify(respuesta.usuario));
       })
     );
+  }
+
+  private perfilPeticion(datos?: { nombre: string; telefono: string; comuna: string }): Observable<PerfilUsuario> {
+    const token = this.obtenerToken();
+    const options = { headers: new HttpHeaders(token ? { Authorization: `Bearer ${token}` } : {}) };
+    const peticion = datos
+      ? this.http.put<PerfilUsuario>(`${this.apiUrl}/perfil`, datos, options)
+      : this.http.get<PerfilUsuario>(`${this.apiUrl}/perfil`, options);
+    return peticion.pipe(tap(usuario => {
+      // Una respuesta de una sesión anterior nunca debe reemplazar la sesión actual.
+      if (token && this.obtenerToken() === token) localStorage.setItem('pethub_usuario', JSON.stringify(usuario));
+    }));
+  }
+
+  verPerfil(): Observable<PerfilUsuario> { return this.perfilPeticion(); }
+  actualizarPerfil(datos: { nombre: string; telefono: string; comuna: string }): Observable<PerfilUsuario> {
+    return this.perfilPeticion(datos);
   }
 
   // Cierra la sesión en este navegador eliminando el token y los datos guardados.

@@ -39,6 +39,8 @@
             <dt>Raza</dt>
             <dd>{{ mascota.raza || 'Sin especificar' }}</dd>
           </div>
+          <div><dt>Fecha de nacimiento</dt><dd>{{ mascota.fechaNacimiento || 'Sin especificar' }}</dd></div>
+          <div><dt>Sexo</dt><dd>{{ mascota.sexo || 'Sin especificar' }}</dd></div>
         </dl>
 
         <button type="button" class="secundario editar" (click)="editarMascota(mascota)">
@@ -92,7 +94,7 @@
         }
 
         <!-- seleccionarFoto valida y convierte la imagen en Data URL. -->
-        <input id="foto" type="file" accept="image/jpeg,image/png,image/webp" [disabled]="cargandoFoto"
+        <input id="foto" type="file" accept="image/jpeg,image/png,image/webp" [disabled]="cargandoFoto || guardando"
           (change)="seleccionarFoto($event)" aria-describedby="ayuda-foto" />
 
         <p id="ayuda-foto">JPG, PNG o WebP. Máximo 5 MB.</p>
@@ -138,13 +140,18 @@
         <label for="raza">Raza (opcional)</label>
         <input id="raza" name="raza" [(ngModel)]="raza" maxlength="80" placeholder="Por ejemplo: mestizo" />
 
+        <label for="fecha-nacimiento">Fecha de nacimiento (opcional)</label>
+        <input id="fecha-nacimiento" name="fechaNacimiento" type="date" [max]="hoy" [(ngModel)]="fechaNacimiento" />
+        <label for="sexo">Sexo (opcional)</label>
+        <select id="sexo" name="sexo" [(ngModel)]="sexo"><option value="">Sin especificar</option><option value="macho">Macho</option><option value="hembra">Hembra</option></select>
+        @if (errorGuardado) { <p role="alert" class="error">{{ errorGuardado }}</p> }
         <!-- Espera a que termine la lectura de la foto. -->
         <div class="acciones">
-          <button type="submit" class="primario" [disabled]="cargandoFoto">
+          <button type="submit" class="primario" [disabled]="cargandoFoto || guardando">
             {{ editandoId !== null ? 'Guardar cambios' : 'Agregar a la lista' }}
           </button>
 
-          <button type="button" class="secundario" (click)="cancelarFormulario()" [disabled]="cargandoFoto">
+          <button type="button" class="secundario" (click)="cancelarFormulario()" [disabled]="cargandoFoto || guardando">
             Cancelar
           </button>
         </div>

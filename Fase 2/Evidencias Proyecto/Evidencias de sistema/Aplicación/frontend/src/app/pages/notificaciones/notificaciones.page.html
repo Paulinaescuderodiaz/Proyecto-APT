@@ -2,7 +2,12 @@
   <main class="pagina">
     <a routerLink="/home">← Inicio</a>
     <h1>Notificaciones</h1>
-    <p>Avisos de solicitudes de sangre que coinciden con tus donantes registrados.</p>
+      <label for="tipo-notificacion">Tipo de aviso</label>
+      <select id="tipo-notificacion" [value]="tipo" (change)="cambiarTipo($event)">
+        <option value="">Todos los tipos</option><option value="solicitud_compatible">Solicitudes de sangre</option>
+        <option value="recordatorio_vacuna">Vacunas</option><option value="cita">Citas</option>
+      </select>
+    <p>Revisa tus avisos y filtra por tipo. Los recordatorios de refuerzo también están disponibles en el inicio.</p>
 
     <div class="acciones">
       <div class="filtros" role="group" aria-label="Filtrar notificaciones">

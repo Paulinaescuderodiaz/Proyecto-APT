@@ -23,8 +23,8 @@ export class NotificacionService {
     return new HttpHeaders(token ? { Authorization: `Bearer ${token}` } : {});
   }
 
-  listar() {
-    return this.http.get<Notificacion[]>(this.url, { headers: this.headers });
+  listar(tipo?: string) {
+    return this.http.get<Notificacion[]>(this.url, { headers: this.headers, ...(tipo ? { params: { tipo } } : {}) });
   }
 
   marcarLeida(id: number) {

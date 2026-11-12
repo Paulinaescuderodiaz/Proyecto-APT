@@ -62,7 +62,7 @@ describe('VacunasComponent — S2-HU04', () => {
     componente.formulario.setValue({
       nombre: 'Triple felina',
       fechaAplicacion: '2026-09-20',
-      fechaProximoRefuerzo: refuerzo,
+      fechaProximoRefuerzo: refuerzo, notas: '', aplicada: false,
     });
   }
 
@@ -255,4 +255,24 @@ describe('VacunasComponent — S2-HU04', () => {
     expect(componente.vacunas).toHaveLength(1);
     expect(componente.errorGuardado).toBe('');
   });
+  it('guarda notas y permite marcar el refuerzo como aplicado al editar', () => {
+    cargarLista([{ ...vacuna, notas: 'Nota anterior' }]);
+    componente.editar(componente.vacunas[0]);
+    expect(componente.formulario.controls.notas.value).toBe('Nota anterior');
+    componente.formulario.controls.notas.setValue(' Control realizado ');
+    componente.formulario.controls.aplicada.setValue(true);
+    enviarFormulario();
+    const req = httpMock.expectOne(`${url}/10`);
+    expect(req.request.body.notas).toBe('Control realizado');
+    expect(req.request.body.aplicada).toBe(true);
+    req.flush({ ...vacuna, notas: 'Control realizado', aplicada: true });
+    fixture.detectChanges(); expect(fixture.nativeElement.textContent).toContain('Control realizado');
+  });
+  it('rechaza notas que exceden el límite de 500 caracteres', () => {
+    cargarLista(); completarFormulario();
+    componente.formulario.controls.notas.setValue('a'.repeat(501));
+    enviarFormulario(); httpMock.expectNone(r => r.method === 'POST');
+    expect(componente.formulario.invalid).toBe(true);
+  });
+
 });

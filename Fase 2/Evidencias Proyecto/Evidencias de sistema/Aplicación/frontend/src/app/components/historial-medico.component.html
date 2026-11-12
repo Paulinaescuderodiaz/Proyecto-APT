@@ -51,6 +51,12 @@
       <textarea id="tratamiento" name="tratamiento" [(ngModel)]="tratamiento" rows="4"
         placeholder="Escribe las indicaciones del veterinario"></textarea>
 
+      <label for="veterinario">Veterinario (opcional)</label>
+      <input id="veterinario" name="veterinario" [(ngModel)]="veterinario" maxlength="100" />
+      <label for="motivo">Motivo de consulta (opcional)</label>
+      <input id="motivo" name="motivo" [(ngModel)]="motivo" maxlength="200" />
+      <label for="recomendaciones">Recomendaciones (opcional)</label>
+      <textarea id="recomendaciones" name="recomendaciones" [(ngModel)]="recomendaciones" maxlength="1000" rows="3"></textarea>
       <button type="submit" class="primario">
         {{ guardando ? 'Guardando…' : 'Guardar registro médico' }}
       </button>
@@ -65,6 +71,20 @@
   <p class="exito" role="status">{{ mensajeExito }}</p>
   }
 
+  @if (cargandoDetalle) { <p role="status">Cargando detalle de consulta…</p> }
+  @if (errorDetalle) { <p role="alert">{{ errorDetalle }}</p> }
+  @if (detalle; as consulta) {
+    <section aria-label="Detalle de consulta" class="registro">
+      <h3>Detalle de consulta</h3>
+      <p>Fecha: {{ consulta.fecha | date:'dd/MM/yyyy':'UTC' }}</p>
+      <p>Diagnóstico: {{ consulta.diagnostico }}</p>
+      <p>Veterinario: {{ consulta.veterinario || 'Sin registrar' }}</p>
+      <p>Motivo: {{ consulta.motivo || 'Sin registrar' }}</p>
+      <p>Tratamiento: {{ consulta.tratamiento || 'Sin registrar' }}</p>
+      <p>Recomendaciones: {{ consulta.recomendaciones || 'Sin registrar' }}</p>
+      <button type="button" class="secundario" (click)="cerrarDetalle()">Cerrar detalle</button>
+    </section>
+  }
   <div class="registros">
     <h3>Registros anteriores</h3>
 
@@ -80,6 +100,10 @@
       <p class="tratamiento">
         {{ registro.tratamiento || 'Sin tratamiento registrado.' }}
       </p>
+      @if (registro.veterinario) { <p>Veterinario: {{ registro.veterinario }}</p> }
+      @if (registro.motivo) { <p>Motivo: {{ registro.motivo }}</p> }
+      @if (registro.recomendaciones) { <p>Recomendaciones: {{ registro.recomendaciones }}</p> }
+      <button type="button" class="secundario" (click)="verDetalle(registro.id)" [disabled]="cargandoDetalle">Ver detalle de consulta</button>
       <app-adjuntar-documento [registroMedicoId]="registro.id"></app-adjuntar-documento>
     </article>
     } @empty {
