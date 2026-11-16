@@ -9,32 +9,36 @@ Aplicación para organizar el cuidado de mascotas y desarrollar una comunidad de
 
 ## Estado actual
 
+Revisión documental: **16 de noviembre de 2026**. Las funciones descritas están integradas en `main`; los pendientes se distinguen a continuación.
+
 ### Disponible en la aplicación
 
-- Registro en dos pasos: nombre y correo; contraseña, confirmación y comuna.
+- Registro en dos pasos: nombre y correo; contraseña, confirmación, teléfono opcional y comuna.
 - Avisos de registro e inicio de sesión. Si el backend rechaza un correo duplicado al enviar el registro, la vista vuelve al primer paso para corregirlo. Todavía no hay una consulta anticipada de disponibilidad del correo.
 - Inicio de sesión con JWT y navegación a `/home`.
 - Inicio con saludo, listado de mascotas del usuario y alternativa visual cuando no hay foto.
-- Creación, listado, detalle y edición de mascotas, con foto opcional.
+- Creación, listado, detalle y edición de mascotas, con foto, fecha de nacimiento y sexo opcionales. La fecha de nacimiento no puede ser futura.
 - Navegación entre Inicio y Mis mascotas.
-- Perfil de solo lectura con nombre y correo, y cierre de sesión en el navegador.
+- Perfil propio con nombre, correo, teléfono y comuna. Permite editar nombre, teléfono y comuna; el correo es de solo lectura. El cierre de sesión elimina la sesión del navegador.
 - Comentarios en español en el código para facilitar la revisión del equipo.
 
 ### Módulos incorporados después de la primera versión
 
 - Rutas de cuenta protegidas mediante `authGuard`; el backend valida el JWT en las consultas.
-- Carnet con vacunas, historial médico, documentos y recordatorios de vacunas.
+- Carnet con vacunas, historial médico, documentos y recordatorios de vacunas. Las vacunas admiten notas de hasta 500 caracteres y edición del estado del refuerzo; la tarjeta distingue refuerzo aplicado, pendiente o sin refuerzo programado.
+- Consultas médicas con veterinario, motivo y recomendaciones opcionales, pantalla de detalle y documentos adjuntos. El nombre del veterinario es texto ingresado por el tutor; no acredita autoría profesional.
 - Inscripción voluntaria de donantes desde la ficha de mascota, búsqueda y solicitudes de sangre.
-- Notificaciones internas de solicitudes de sangre.
-- En la rama `feat/contacto-web`: conversaciones entre tutores, envío de mensajes y actualización manual. El aviso de evaluación veterinaria presencial permanece visible al abrir una conversación.
+- Notificaciones internas de solicitudes de sangre, filtros por tipo y lectura y marcado como leídas. El tipo de API para vacunas es `recordatorio_vacuna`. Los recordatorios del inicio se consultan por separado de la campana; su presencia no implica una notificación de ese tipo.
+- Contacto y conversaciones entre tutores integrados en `main`, con envío, conservación y actualización manual de mensajes. El aviso de evaluación veterinaria presencial permanece visible al abrir una conversación. No se implementa mensajería en tiempo real.
 
-### Validación pendiente
+### Pendientes y límites de esta versión
 
-- Completar la prueba del contacto entre dos cuentas con backend y PostgreSQL en el equipo de desarrollo. Un servidor que muestra el puerto 3000 no demuestra que la migración del chat esté aplicada.
-- Verificar visualmente la aplicación real después de los cambios. Las pruebas de componentes no sustituyen esta revisión.
-- Integrar la rama de contacto después de su revisión. No se declara mensajería en tiempo real.
-- Definir el contenido y la validación de la sección educativa pendiente. Foro y moderación están fuera del alcance web acordado.
-- Edición del perfil y revisión de coherencia de límites de carga de fotos.
+- Confirmar visualmente en el equipo local las etiquetas del estado del refuerzo incorporadas en el PR 14; sus escenarios ya tienen pruebas automatizadas.
+- Consolidar la evaluación de usabilidad y las capturas finales. Las pruebas automatizadas no sustituyen esa evaluación.
+- Definir el contenido y la validación de la sección educativa. Foro y moderación están fuera del alcance web acordado.
+- Desarrollar la ficha con pestañas y microchip, desparasitación y procedimientos si se mantienen en el alcance acordado. No se presentan como implementados.
+- Agenda, citas, perfil veterinario e integración con clínicas dependen de la definición académica. El filtro «Citas» no acredita una agenda implementada; correo de confirmación y push real son ampliaciones futuras.
+- La búsqueda utiliza datos registrados y no certifica compatibilidad ni aptitud para donar: esa evaluación corresponde al equipo veterinario.
 
 ## Tecnologías
 
@@ -53,8 +57,8 @@ El frontend consulta la API HTTP del backend. El backend utiliza Prisma para acc
 | Ruta | Contenido |
 | --- | --- |
 | `frontend/src/app/home/` | Pantalla de inicio |
-| `frontend/src/app/pages/` | Bienvenida, login, registro, mascotas y perfil |
-| `frontend/src/app/services/` | Comunicación con autenticación y mascotas |
+| `frontend/src/app/pages/` | Bienvenida, login, registro, mascotas, perfil, notificaciones y conversaciones |
+| `frontend/src/app/services/` | Comunicación con la API de cuenta, mascotas, carnet, documentos, donantes, solicitudes, notificaciones y conversaciones |
 | `frontend/src/app/app.routes.ts` | Rutas de navegación |
 | `backend/index.js` | Inicio del servidor en el puerto 3000 |
 | `backend/src/app.js` | Configuración de Express y montaje de rutas |
@@ -159,12 +163,12 @@ Las direcciones de la API están definidas en los archivos `frontend/src/app/ser
 | `/login` | Inicio de sesión |
 | `/home` | Inicio y resumen de mascotas |
 | `/mascotas` | Listado, formulario y detalle |
-| `/perfil` | Datos de cuenta y cierre de sesión |
+| `/perfil` | Consulta y edición del perfil propio y cierre de sesión |
 | `/solicitudes-sangre` | Publicación y gestión de solicitudes |
 | `/buscar-donantes` | Búsqueda y contacto con el tutor |
 | `/notificaciones` | Avisos internos de solicitudes |
-| `/conversaciones` | Lista de conversaciones en la rama de contacto |
-| `/conversaciones/:id` | Mensajes y aviso veterinario en la rama de contacto |
+| `/conversaciones` | Lista de conversaciones propias, integrada en `main` |
+| `/conversaciones/:id` | Mensajes propios con actualización manual y aviso veterinario |
 
 ## API principal
 
@@ -175,6 +179,8 @@ Base local: `http://localhost:3000`.
 | GET | `/` | Comprobar que el servidor responde |
 | POST | `/api/auth/registro` | Crear una cuenta |
 | POST | `/api/auth/login` | Iniciar sesión |
+| GET | `/api/auth/perfil` | Consultar el perfil propio |
+| PUT | `/api/auth/perfil` | Editar nombre, teléfono y comuna del perfil propio |
 | GET | `/api/mascotas` | Listar mascotas del usuario |
 | POST | `/api/mascotas` | Crear una mascota |
 | PUT | `/api/mascotas/:id` | Actualizar una mascota |
@@ -183,6 +189,7 @@ Base local: `http://localhost:3000`.
 | PUT | `/api/vacunas/:id` | Actualizar una vacuna |
 | POST | `/api/registros-medicos` | Crear un registro médico |
 | GET | `/api/registros-medicos/mascota/:mascotaId` | Consultar historial |
+| GET | `/api/registros-medicos/:id` | Consultar el detalle de una consulta propia y sus documentos |
 | POST | `/api/documentos` | Subir un documento |
 | GET | `/api/documentos/registro/:registroMedicoId` | Listar adjuntos de un registro propio |
 | GET | `/api/documentos/:id/archivo` | Abrir un archivo propio |
@@ -209,7 +216,7 @@ El login guarda `pethub_token` y `pethub_usuario` en el almacenamiento local del
 
 ## Preparar y comprobar el contacto web del Sprint 4
 
-Usa una copia que incluya la rama de contacto. Desde la raíz del repositorio entra a la carpeta correcta:
+El contacto web está integrado en `main`. Usa una copia actualizada de esa rama. Desde la raíz del repositorio entra a la carpeta correcta:
 
 ```powershell
 cd "Fase 2/Evidencias Proyecto/Evidencias de sistema/Aplicación/backend"
@@ -237,7 +244,7 @@ Con el frontend abierto en `http://localhost:4200`, comprueba:
 5. Responder desde A y actualizar desde B. Recargar y volver a contactar: debe recuperarse la misma conversación y conservar los mensajes y el aviso.
 6. Una tercera cuenta no debe poder leer ni escribir en esa conversación. Debe mostrarse el rechazo de acceso.
 
-Estas comprobaciones están pendientes en el equipo de Paulina; no se registran como aprobadas por estar documentadas. La actualización de mensajes es manual.
+El recorrido anterior permite reproducir y revisar el contacto entre cuentas en cada entorno local. No es una lista de pendientes de integración: el contacto ya está en `main`. La validación automatizada se referencia en la sección siguiente; documentar estos pasos no certifica que se hayan ejecutado en otro computador. La actualización de mensajes es manual.
 
 Si aparece un error, abre DevTools → **Network**, selecciona la petición `conversaciones` que falla y revisa **Response**. Guarda el estado HTTP y el mensaje, sin compartir tokens. Un `204` de tipo `preflight` es la comprobación CORS, no el resultado del contacto. Un `400` puede indicar que se intenta contactar a la propia cuenta; un `500` requiere revisar el detalle de la terminal que mantiene el backend iniciado.
 
@@ -258,7 +265,7 @@ npm.cmd test
 npm.cmd run build
 ```
 
-Estos comandos corresponden a los scripts existentes. La actualización de este README no implica que las pruebas o la compilación se hayan ejecutado ni que estén aprobadas.
+Estos comandos corresponden a los scripts existentes. La ejecución de [Validación Pethub del 16 de noviembre de 2026](https://github.com/Paulinaescuderodiaz/Proyecto-APT/actions/runs/43895397021), sobre el commit `70360886172a1c70126452a0487c20abce5606a1`, aprobó **119 pruebas del frontend en 17 archivos** y **154 pruebas del backend en 17 suites**: **273 pruebas en total**. La compilación de producción del frontend también fue aprobada. Estas cifras corresponden a esa ejecución; esta corrección documental no constituye una nueva ejecución ni una evaluación de usabilidad o validación clínica.
 
 Comprobación manual del flujo principal:
 
@@ -266,7 +273,7 @@ Comprobación manual del flujo principal:
 2. Probar credenciales incorrectas y comprobar el aviso.
 3. Agregar una mascota y verificar que aparece en Inicio después de recargar.
 4. Editar sus datos y comprobar que se conservan.
-5. Abrir Perfil, revisar nombre y correo y cerrar sesión.
+5. Abrir Perfil, editar nombre, teléfono o comuna y comprobar su conservación tras recargar. El correo permanece de solo lectura. Cerrar sesión.
 
 ## Problemas frecuentes
 
