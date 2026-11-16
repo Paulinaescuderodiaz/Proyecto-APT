@@ -1,0 +1,11 @@
+# Unifica las identidades de Git de cada integrante (git shortlog, git log).
+# Formato: Nombre canonico <correo canonico> <correo usado en el commit>
+
+# Paulina Escudero Diaz
+Paulina Escudero Díaz <67618515+Paulinaescuderodiaz@users.noreply.github.com>
+Paulina Escudero Díaz <67618515+Paulinaescuderodiaz@users.noreply.github.com> <paulinaandreaed@gmail.com>
+Paulina Escudero Díaz <67618515+Paulinaescuderodiaz@users.noreply.github.com> <pescudero@cread.org.pe>
+
+# Evelyn Barrera Guevara
+Evelyn Barrera Guevara <94207944+Eve91@users.noreply.github.com>
+Evelyn Barrera Guevara <94207944+Eve91@users.noreply.github.com> <evelynbarreraguevara@gmail.com>
