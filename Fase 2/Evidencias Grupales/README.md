@@ -1,12 +1,12 @@
 # Evidencias grupales — Fase 2
 
-El informe maestro se edita en [Google Drive](https://docs.google.com/document/d/1qAeWTkF8sK2AwP3m-HEpf3GIH0_b550R/edit). El DOCX de esta carpeta es la copia sincronizada de entrega, no una versión independiente.
+Esta carpeta contiene el informe de avance (2.4) y el informe final (2.6) en formato Word, junto con la planilla de evaluación de la fase.
 
 ## Anexos del informe
 
 - A: `../Evidencias Proyecto/Evidencias de documentación/Pethub_Evidencia_de_Pruebas.docx`
-- B: `../Evidencias Proyecto/Evidencias de documentación/Pethub_Sprint3_Scrum.xlsx`
-- C: `../Evidencias Proyecto/Presentación Proyecto.pptx`
+- B: `../Evidencias Proyecto/Evidencias de documentación/Pethub_Sprint1.xlsx` a `Pethub_Sprint4.xlsx` (seguimiento Scrum de los sprints 1 a 4)
+- C: `../../Fase 3/Evidencias Grupales/Presentación Final del proyecto (Español).pptx`
 - D: `../Evidencias Proyecto/Evidencias de documentación/Pethub_Carta_Gantt.xlsx`
 
 ## Validación automatizada más reciente

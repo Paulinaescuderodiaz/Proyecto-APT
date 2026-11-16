@@ -12,6 +12,11 @@ async function registro(req, res) {
       return res.status(400).json({ error: "Faltan datos: nombre, email y password son obligatorios" });
     }
 
+    // Seguridad: los tres deben ser texto; un objeto o un numero provocaria un error 500 en la base
+    if (typeof nombre !== "string" || typeof email !== "string" || typeof password !== "string") {
+      return res.status(400).json({ error: "nombre, email y password deben ser texto" });
+    }
+
     if (comuna != null && typeof comuna !== "string") {
       return res.status(400).json({ error: "La comuna debe ser un texto" });
     }
@@ -66,6 +71,11 @@ async function login(req, res) {
 
     if (!email || !password) {
       return res.status(400).json({ error: "Faltan datos: email y password son obligatorios" });
+    }
+
+    // Seguridad: deben ser texto; un objeto o un numero provocaria un error 500
+    if (typeof email !== "string" || typeof password !== "string") {
+      return res.status(400).json({ error: "email y password deben ser texto" });
     }
 
     const usuario = await prisma.usuario.findUnique({ where: { email } });
