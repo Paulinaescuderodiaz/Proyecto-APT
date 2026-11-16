@@ -6,7 +6,7 @@ Pethub es una aplicación web dirigida a tutores de mascotas para organizar su i
 
 Incorpora registro e inicio de sesión, gestión de mascotas, vacunas, historial médico, documentos veterinarios, recordatorios dentro de la aplicación, inscripción de donantes, publicación y cierre de solicitudes de sangre y búsqueda por especie y grupo sanguíneo, con prioridad por comuna cuando se indica.
 
-Es un proyecto académico en desarrollo. La búsqueda relaciona datos registrados; la compatibilidad y la aptitud para donar deben confirmarse con un equipo veterinario. El alcance vigente es una plataforma web con carnet sanitario, red de donantes y una sección educativa planificada (HU18 / RF-28), cuyo contenido, fuentes, validación y estimación siguen pendientes. El foro y su moderación se retiraron del alcance; se conservan sus identificadores históricos. Las notificaciones son internas: esta entrega no exige push ni una aplicación nativa Android/iOS. El chat o contacto directo, el correo, los nuevos módulos de la práctica y el acceso e integración de clínicas siguen por definir.
+Es un proyecto académico en desarrollo. La búsqueda relaciona datos registrados; la compatibilidad y la aptitud para donar deben confirmarse con un equipo veterinario. El alcance vigente es una plataforma web con carnet sanitario, red de donantes y una sección educativa planificada (HU18 / RF-28), cuyo contenido, fuentes, validación y estimación siguen pendientes. El foro y su moderación se retiraron del alcance; se conservan sus identificadores históricos. Las notificaciones son internas: esta entrega no exige push ni una aplicación nativa Android/iOS. El contacto directo y la mensajería entre tutores están implementados en la versión web, con conversaciones guardadas y actualización manual de mensajes. El correo, los nuevos módulos de la práctica y el acceso e integración de clínicas siguen por definir.
 
 ## 2. Tecnologías utilizadas
 
@@ -66,10 +66,14 @@ Abre **http://localhost:4200**. El frontend consulta la API en `http://localhost
 | `/buscar-donantes` | Búsqueda de donantes |
 | `/notificaciones` | Avisos de solicitudes coincidentes y marcado como leídos |
 | `/perfil` | Datos de la cuenta y cierre de sesión |
+| `/conversaciones` | Listado de conversaciones propias |
+| `/conversaciones/:id` | Consulta y envío de mensajes en una conversación propia |
 
-Inicio ofrece accesos a solicitudes, inscripción y búsqueda de donantes. La campana abre las notificaciones, donde puedes consultar todos los avisos, filtrar los no leídos y marcarlos como leídos. Los mensajes y la comunidad todavía muestran “Próximamente”: son elementos heredados de la interfaz; el foro está retirado del alcance y el chat sigue pendiente de decisión. La sección educativa está planificada y aún no se presenta como implementada.
+Inicio ofrece accesos a solicitudes, inscripción y búsqueda de donantes. La campana abre las notificaciones, donde puedes consultar todos los avisos, filtrar los no leídos y marcarlos como leídos. El acceso a mensajes abre las conversaciones propias. Desde los resultados de búsqueda, «Contactar al tutor» inicia o recupera una conversación y muestra el aviso de evaluación veterinaria obligatoria. Los mensajes se guardan y se consultan mediante actualización manual; no se implementa mensajería en tiempo real ni alertas push. El foro está retirado del alcance. La sección educativa está planificada y aún no se presenta como implementada.
 
 ### Pruebas y apagado
+
+Última ejecución verificada: **12 de noviembre de 2026**, sobre el commit `68113e8c68fe1747f9953aed5be8d3aa35b24ed0`, integrado en `main` mediante el [PR 14](https://github.com/Paulinaescuderodiaz/Proyecto-APT/pull/14). Se aprobaron **119 pruebas del frontend en 17 archivos** y **154 pruebas del backend en 17 suites**: **273 pruebas en total**. La compilación de producción del frontend también fue aprobada. [Consultar la ejecución y sus registros en GitHub Actions](https://github.com/Paulinaescuderodiaz/Proyecto-APT/actions/runs/43329517606). Estas cifras corresponden a esa ejecución; no equivalen a una validación de usabilidad ni clínica.
 
 Desde `frontend`:
 
